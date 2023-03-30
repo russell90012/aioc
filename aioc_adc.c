@@ -69,16 +69,21 @@
 #define GP_MODE_BUSY_GP_EN_offset     1
 #define GP_MODE_BUSY_GP_EN_mask       0x1
 
-
-
-
-
-
-	      
+      
 
 #define ADC_REGISTER_SIZE_MAX 32
 #define ADC_INSTRUCTION_SIZE  2
 
+#define CONVERSION_MODE_COMMAND_channel_selection(channel_number) \
+          (0x10+(channel_number & 0xF))
+#define CONVERSION_MODE_COMMAND_register_configuration_mode  (0xA)
+
+//==============================================================================
+//==============================================================================
+
+//==============================================================================
+//==============================================================================
+// Private functions declarations.
 //==============================================================================
 //==============================================================================
 
@@ -97,11 +102,36 @@ aioc_error_t aioc_adc_register_read(
 //==============================================================================
 //==============================================================================
 
+
+//==============================================================================
+//==============================================================================
+// Public functions.
+//==============================================================================
+//==============================================================================
+
+//==============================================================================
+//==============================================================================
 aioc_error_t aioc_adc_self_check(void)
 {
   aioc_error_t e = error_none;
   uint8_t data;
 
+ // Check the Device Status Register for reset flag or spi error.
+  data = 0;
+  e = aioc_adc_register_read(STATUS_adrs, &data, 1);
+  if (e)
+  {
+    return e;
+  }
+  if (STATUS_RESET_FLAG_read(data))
+  {
+    return error_no_reset;
+  }  
+  if (STATUS_SPI_ERROR_read(data))
+  {
+    return error_spi_bus;
+  }
+  
   // Check the Vendor ID of the ADC.
   //  Read vendor id low register and check the id.
   //  Read vendor id high register and check the id.
@@ -138,23 +168,7 @@ aioc_error_t aioc_adc_self_check(void)
     return error_device_type;
   }
 
-  // Check the Device Status Register for reset flag or spi error.
-  data = 0;
-  e = aioc_adc_register_read(STATUS_adrs, &data, 1);
-  if (e)
-  {
-    return e;
-  }
-  if (STATUS_RESET_FLAG_read(data))
-  {
-    return error_no_reset;
-  }  
-  if (STATUS_SPI_ERROR_read(data))
-  {
-    return error_spi_bus;
-  }
-  
-  // Check scratch pad register access.
+   // Check scratch pad register access.
   //  Write 0xA5 to scratch pad register then read it back.
   data = 0xA5;
   e = aioc_adc_register_write(SCRATCH_PAD_adrs, &data, 1);
@@ -181,7 +195,7 @@ aioc_error_t aioc_adc_self_check(void)
 aioc_error_t aioc_adc_configure_single_cycle_mode(void)
 {
   aioc_error_t e = error_none;
-  volatile uint8_t data;
+  uint8_t data;
   
   // When single-cycle command mode is enabled, the first analog input
   // channel selected is the one specified in the AS_SLOT0 register.
@@ -278,56 +292,44 @@ aioc_error_t aioc_adc_configure_single_cycle_mode(void)
 
 //==============================================================================
 //==============================================================================
-aioc_error_t aioc_adc_to_register_mode(void)
+// Issue specific input channel selection command.
+aioc_error_t aioc_adc_conversion_mode_command_channel_selection(uint32_t input)
 {
   aioc_error_t e = error_none;
-  uint8_t data = 0;
   
-  // Put the ADC into Register configuration mode.
-  // NOTE: This ASSUMES the ADC is in Conversion mode.
+  // Issue specific input channel selection command.
   e = aioc_adc_conversion_mode_command_issue(
-        CONVERSION_MODE_COMMAND_register_configuration_mode);
+        CONVERSION_MODE_COMMAND_channel_selection(input));
   if (e)
   {
     return e;
   }
   
-  // Check the Vendor ID of the ADC.
-  //  Read vendor id low register and check the id.
-  //  Read vendor id high register and check the id.
-  e = aioc_adc_register_read(VENDOR_L_adrs, &data, 1);
-  if (e)
-  {
-    return e;
-  }
-  if (data != VENDOR_L_reset)
-  {
-    return error_vendor_id_low;
-  }
-  data = 0;
-  aioc_adc_register_read(VENDOR_H_adrs, &data, 1);
-  if (e)
-  {
-    return e;
-  }
-  if (data != VENDOR_H_reset)
-  {
-    return error_vendor_id_high;
-  }
+  return error_none;
+}
 
-  // Check the Device Status Register for spi error.
-  data = 0;
-  e = aioc_adc_register_read(STATUS_adrs, &data, 1);
+
+//==============================================================================
+// Read 16 bit result from ADC.
+// NOTE: Must be in conversion mode for this to work.
+//==============================================================================
+// TBD
+// Endianess????
+aioc_error_t aioc_adc_conversion_mode_result_read(uint16_t* result)
+{
+  aioc_error_t e = error_none;
+  uint8_t data[2] = {0, 0};
+  
+  // Read 16 bits.
+  e = aioc_util_spi_read(data, 2);
   if (e)
-  {
-    return e;
-  }
-  if (STATUS_SPI_ERROR_read(data))
   {
     return error_spi_bus;
   }
-
-  return error_none;
+  
+  *result = (uint16_t)((data[1] << 8)| data[0]);
+  
+  return error_none;  
 }
 
 //==============================================================================
@@ -362,6 +364,70 @@ aioc_error_t aioc_adc_to_conversion_mode(void)
 }
 
 //==============================================================================
+//==============================================================================
+aioc_error_t aioc_adc_to_register_mode(void)
+{
+  aioc_error_t e = error_none;
+  uint8_t data = 0;
+  
+  // Put the ADC into Register configuration mode.
+  // NOTE: This ASSUMES the ADC is in Conversion mode.
+  e = aioc_adc_conversion_mode_command_issue(
+        CONVERSION_MODE_COMMAND_register_configuration_mode);
+  if (e)
+  {
+    return e;
+  }
+  
+  // Check the Device Status Register for spi error.
+  data = 0;
+  e = aioc_adc_register_read(STATUS_adrs, &data, 1);
+  if (e)
+  {
+    return e;
+  }
+  if (STATUS_SPI_ERROR_read(data))
+  {
+    return error_spi_bus;
+  }
+
+  // Check the Vendor ID of the ADC.
+  //  Read vendor id low register and check the id.
+  //  Read vendor id high register and check the id.
+  e = aioc_adc_register_read(VENDOR_L_adrs, &data, 1);
+  if (e)
+  {
+    return e;
+  }
+  if (data != VENDOR_L_reset)
+  {
+    return error_vendor_id_low;
+  }
+  
+  data = 0;
+  aioc_adc_register_read(VENDOR_H_adrs, &data, 1);
+  if (e)
+  {
+    return e;
+  }
+  if (data != VENDOR_H_reset)
+  {
+    return error_vendor_id_high;
+  }
+
+  return error_none;
+}
+
+
+
+
+//==============================================================================
+//==============================================================================
+// Private functions.
+//==============================================================================
+//==============================================================================
+
+//==============================================================================
 // Write 5 bit conversion mode command to ADC.
 // NOTE: Must be in conversion mode for this to work.
 //==============================================================================
@@ -381,29 +447,6 @@ aioc_error_t aioc_adc_conversion_mode_command_issue(uint32_t command)
   }
     
   return error_none;
-}
-
-//==============================================================================
-// Read 16 bit result from ADC.
-// NOTE: Must be in conversion mode for this to work.
-//==============================================================================
-// TBD
-// Endianess????
-aioc_error_t aioc_adc_conversion_mode_result_read(uint16_t* result)
-{
-  aioc_error_t e = error_none;
-  uint8_t data[2] = {0, 0};
-  
-  // Read 16 bits.
-  e = aioc_util_spi_read(data, 2);
-  if (e)
-  {
-    return error_spi_bus;
-  }
-  
-  *result = (uint16_t)((data[1] << 8)| data[0]);
-  
-  return error_none;  
 }
 
 //==============================================================================

@@ -9,26 +9,31 @@
 
 //==============================================================================
 //==============================================================================
-aioc_error_t 
+// Public functions declarations.
+//==============================================================================
+//==============================================================================
+
+aioc_error_t
 aioc_adc_self_check(void);
 
 aioc_error_t
 aioc_adc_configure_single_cycle_mode(void);
 
+// Issue specific input channel selection command.
 aioc_error_t
-aioc_adc_to_conversion_mode(void);
+aioc_adc_conversion_mode_command_channel_selection(uint32_t input);
 
-#define CONVERSION_MODE_COMMAND_channel_selection(channel_number) \
-          (0x10+(channel_number & 0xF))
-#define CONVERSION_MODE_COMMAND_register_configuration_mode  (0xA)
-aioc_error_t 
-aioc_adc_conversion_mode_command_issue(uint32_t command);
-
+// Read 16 bit result from ADC.
+// NOTE: Must be in conversion mode for this to work.
 aioc_error_t
 aioc_adc_conversion_mode_result_read(uint16_t* result);
 
 aioc_error_t
-aioc_adc_reset_all(void);
+aioc_adc_to_conversion_mode(void);
+
+aioc_error_t
+aioc_adc_to_register_mode(void);
+
 
 
 #endif  // AIOC_ADC_H

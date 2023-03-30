@@ -21,8 +21,6 @@ typedef enum
 aioc_adc_id_t;
 
 
-//==============================================================================
-//==============================================================================
 // SPI device id and cs table
 typedef struct
 {
@@ -94,41 +92,20 @@ aioc_ai_info_t  aioc_ai_info_table[] =
 
 //==============================================================================
 //==============================================================================
+// Private functions declarations.
+//==============================================================================
+//==============================================================================
 aioc_error_t aioc_api_adc_reset_all(void);
 
 //==============================================================================
 //==============================================================================
-aioc_error_t aioc_self_test(void)
-{
-  aioc_error_t e = error_none;
-  uint16_t result;
- 
-  // Initialize the board devices.
-  e = aioc_api_init();
-  if (e)
-  {
-    return e;
-  }
-  
-  // Stimulate the signal under test.
-  // TBD
-  
-  e = aioc_api_single_channel_conversion(
-        AIOC_AI_LEFT_FWD_OVER_PRESSURE_SENSOR,
-        &result);
-  if (e)
-  {
-    return e;
-  }
-  
-  //Check the results.
-  // TBD
-  
-  return error_none;
-}
 
 
-
+//==============================================================================
+//==============================================================================
+// Public functions.
+//==============================================================================
+//==============================================================================
 
 //==============================================================================
 /**
@@ -195,6 +172,7 @@ aioc_error_t aioc_api_init(void)
   return error_none;
 }
 
+
 //==============================================================================
 //==============================================================================
 aioc_error_t aioc_api_single_channel_conversion(
@@ -214,8 +192,7 @@ aioc_error_t aioc_api_single_channel_conversion(
   }      
 
   // Issue specific input channel selection command.
-  e = aioc_adc_conversion_mode_command_issue(
-        CONVERSION_MODE_COMMAND_channel_selection(input));
+  e = aioc_adc_conversion_mode_command_channel_selection(input);
   if (e)
   {
     return e;
@@ -250,6 +227,13 @@ aioc_error_t aioc_api_single_channel_conversion(
   // return conversion.
   return error_none;
 }
+
+
+//==============================================================================
+//==============================================================================
+// Private functions.
+//==============================================================================
+//==============================================================================
 
 //==============================================================================
 //==============================================================================
@@ -301,46 +285,6 @@ aioc_error_t aioc_api_adc_reset_all(void)
   return error_none;
 }
 
-
-//==============================================================================
-//==============================================================================
-aioc_error_t aioc_adc_conversion_single_cycle_mode(
-  uint32_t convert_id,
-  uint32_t input,
-  uint16_t* result)
-{
-  aioc_error_t e = error_none;
-
-  // Issue specific input channel selection command.
-  e = aioc_adc_conversion_mode_command_issue(
-        CONVERSION_MODE_COMMAND_channel_selection(input));
-  if (e)
-  {
-    return e;
-  }
-  
-  // Pulse the appropriate ADC convert signal active (low) for appropriate
-  // duration.
-  //  CNV Low Time: tCNVL: 80 ns
-  e = aioc_util_ultrascale_gpio_pulse_low(convert_id, 80);
-  if (e)
-  {
-    return e;
-  }
-
-  // Delay for conversion time.
-  //  Conversion Time: tCONVERT: 380-415 ns.
-  aioc_util_delay_ns(500);
-  
-  // Read the conversion result.
-  e = aioc_adc_conversion_mode_result_read(result);
-  if (e)
-  {
-    return e;
-  }
-  
-  return error_none;
-}
 
 
 
