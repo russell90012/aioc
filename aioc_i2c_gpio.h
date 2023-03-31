@@ -269,7 +269,6 @@ i2c_gpio_pin_name_t;
 aioc_error_t
 aioc_i2c_gpio_configure(void);
 
-
 //==============================================================================
 // Pulse the specified pin low for the specified nannoseconds.
 //==============================================================================
@@ -278,13 +277,12 @@ aioc_i2c_gpio_pin_pulse_low(
   i2c_gpio_pin_name_t pin_name, 
   uint32_t pulse_duration);
 
-//==============================================================================
-//==============================================================================
 aioc_error_t
-aioc_i2c_gpio_register_write(
-  uint32_t device_address,
-  uint32_t command_byte,
-  uint8_t data);
+aioc_i2c_gpio_pin_level_set(i2c_gpio_pin_name_t pin_name, uint32_t level);
+
+//==============================================================================
+//==============================================================================
+
 
 
 #endif  // AIOC_I2C_GPIO_H

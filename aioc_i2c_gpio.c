@@ -188,12 +188,28 @@ i2c_gpio_device_t;
 
 static i2c_gpio_device_t i2c_gpio_devices[NUM_DEVICES] = {0};
 
-//==============================================================================
-//==============================================================================
-aioc_error_t aioc_i2c_gpio_write_device_maps(void);
+
 
 //==============================================================================
 //==============================================================================
+// Private functions declarations.
+//==============================================================================
+//==============================================================================
+aioc_error_t aioc_i2c_gpio_write_device_maps(void);
+aioc_error_t aioc_i2c_gpio_register_write(
+              uint32_t device_address,
+              uint32_t command_byte,
+              uint8_t data);
+
+//==============================================================================
+//==============================================================================
+
+//==============================================================================
+//==============================================================================
+// Public functions.
+//==============================================================================
+//==============================================================================
+
 aioc_error_t aioc_i2c_gpio_configure(void)
 {
   i2c_gpio_pin_conf_t* pin_conf = 0;
@@ -236,6 +252,132 @@ aioc_error_t aioc_i2c_gpio_configure(void)
   
   return error_none;
 }
+
+
+
+//==============================================================================
+// Pulse the specified pin low for the specified nannoseconds.
+//==============================================================================
+aioc_error_t aioc_i2c_gpio_pin_pulse_low( i2c_gpio_pin_name_t pin_name, 
+                                          uint32_t pulse_duration) 
+{
+  aioc_error_t e;
+
+  if (pin_name >= NUMBER_OF_GPIO_PINS)
+  {
+    return error_bad_param;
+  }
+  
+  e = aioc_util_i2c_open();
+  if (e)
+  {
+    return error_i2c_bus;
+  }
+  
+  // Get the device address, command byte and register data.  Make a backup of the
+  // data.  Then set the pin bit low in the data.  Then write out the data.
+  // Then perform the delay.  Then write out the backup.
+  {
+    i2c_gpio_pin_conf_t*  pin_conf = &i2c_gpio_pin_configuration_table[pin_name];
+    uint32_t              device_adrs = pin_conf->device_adrs;
+    uint32_t              device = device_adrs - DEVICE_ADRS_BASE;
+    uint32_t              bank = pin_conf->bank;
+    uint32_t              pin = pin_conf->pin;
+    uint32_t              command_byte = COMMAND_BYTE_OUTPUT_0 + bank;
+    uint8_t               data = 0;
+    
+    data = i2c_gpio_devices[device].regs.output[bank];
+    data = data & (uint8_t)((~(1 << pin)) & 0xFF);
+    e = aioc_i2c_gpio_register_write(
+          device_adrs,
+          command_byte,
+          data);
+    if (e)
+    {
+      return error_i2c_bus;
+    }
+    
+    aioc_util_delay_ns(pulse_duration);
+    
+    data = i2c_gpio_devices[device].regs.output[bank];
+    e = aioc_i2c_gpio_register_write(
+          device_adrs,
+          command_byte,
+          data);
+    if (e)
+    {
+      return error_i2c_bus;
+    }
+  }
+  
+  e = aioc_util_i2c_close();
+  if (e)
+  {
+    return error_i2c_bus;
+  }
+  
+  return error_none;
+}
+
+//==============================================================================
+// Set the specified pin to specified value.
+//==============================================================================
+aioc_error_t aioc_i2c_gpio_pin_level_set( i2c_gpio_pin_name_t pin_name, 
+                                          uint32_t level) 
+{
+  aioc_error_t e;
+
+  if (pin_name >= NUMBER_OF_GPIO_PINS)
+  {
+    return error_bad_param;
+  }
+  
+  e = aioc_util_i2c_open();
+  if (e)
+  {
+    return error_i2c_bus;
+  }
+  
+  // Get the device address, command byte and register data.  Make a backup of the
+  // data.  Then set the pin bit low in the data.  Then write out the data.
+  // Then perform the delay.  Then write out the backup.
+  {
+    i2c_gpio_pin_conf_t*  pin_conf = &i2c_gpio_pin_configuration_table[pin_name];
+    uint32_t              device_adrs = pin_conf->device_adrs;
+    uint32_t              device = device_adrs - DEVICE_ADRS_BASE;
+    uint32_t              bank = pin_conf->bank;
+    uint32_t              pin = pin_conf->pin;
+    uint32_t              command_byte = COMMAND_BYTE_OUTPUT_0 + bank;
+    uint8_t               data = 0;
+    
+    data = i2c_gpio_devices[device].regs.output[bank];
+    data = data & (uint8_t)((~(1 << pin)) & 0xFF);
+    e = aioc_i2c_gpio_register_write(
+          device_adrs,
+          command_byte,
+          data);
+    if (e)
+    {
+      return error_i2c_bus;
+    }    
+  }
+  
+  e = aioc_util_i2c_close();
+  if (e)
+  {
+    return error_i2c_bus;
+  }
+  
+  return error_none;
+}
+
+
+
+//==============================================================================
+//==============================================================================
+// Private functions.
+//==============================================================================
+//==============================================================================
 
 //==============================================================================
 // Open spi bus.
@@ -323,69 +465,6 @@ aioc_error_t aioc_i2c_gpio_write_device_maps(void)
   return error_none;
 }
 
-//==============================================================================
-// Pulse the specified pin low for the specified nannoseconds.
-//==============================================================================
-aioc_error_t aioc_i2c_gpio_pin_pulse_low( i2c_gpio_pin_name_t pin_name, 
-                                          uint32_t pulse_duration) 
-{
-  aioc_error_t e;
-
-  if (pin_name >= NUMBER_OF_GPIO_PINS)
-  {
-    return error_bad_param;
-  }
-  
-  e = aioc_util_i2c_open();
-  if (e)
-  {
-    return error_i2c_bus;
-  }
-  
-  // Get the device address, command byte and register data.  Make a backup of the
-  // data.  Then set the pin bit low in the data.  Then write out the data.
-  // Then perform the delay.  Then write out the backup.
-  {
-    i2c_gpio_pin_conf_t*  pin_conf = &i2c_gpio_pin_configuration_table[pin_name];
-    uint32_t              device_adrs = pin_conf->device_adrs;
-    uint32_t              device = device_adrs - DEVICE_ADRS_BASE;
-    uint32_t              bank = pin_conf->bank;
-    uint32_t              pin = pin_conf->pin;
-    uint32_t              command_byte = COMMAND_BYTE_OUTPUT_0 + bank;
-    uint8_t               data = 0;
-    
-    data = i2c_gpio_devices[device].regs.output[bank];
-    data = data & (uint8_t)((~(1 << pin)) & 0xFF);
-    e = aioc_i2c_gpio_register_write(
-          device_adrs,
-          command_byte,
-          data);
-    if (e)
-    {
-      return error_i2c_bus;
-    }
-    
-    aioc_util_delay_ns(pulse_duration);
-    
-    data = i2c_gpio_devices[device].regs.output[bank];
-    e = aioc_i2c_gpio_register_write(
-          device_adrs,
-          command_byte,
-          data);
-    if (e)
-    {
-      return error_i2c_bus;
-    }
-  }
-  
-  e = aioc_util_i2c_close();
-  if (e)
-  {
-    return error_i2c_bus;
-  }
-  
-  return error_none;
-}
 
 //==============================================================================
 //==============================================================================
