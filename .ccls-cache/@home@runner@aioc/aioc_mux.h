@@ -22,7 +22,8 @@ aioc_mux_lines_t;
 //==============================================================================
 //==============================================================================
 aioc_error_t
-aioc_mux_switch_lines(aioc_mux_lines_t aioc_mux_lines,
-                      aioc_mux_banks_t aioc_mux_banks);
+aioc_mux_switch_lines(
+  aioc_mux_banks_t aioc_mux_banks,
+  aioc_mux_lines_t aioc_mux_lines);
 
 #endif  // AIOC_MUX_H

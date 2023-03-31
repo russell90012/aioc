@@ -21,7 +21,11 @@ typedef enum  // aioc_error_t
 }
 aioc_error_t;
 
-typedef  unsigned int  xaioc_error_t;
 
+#define BOOL(x) (!(!(x)))
 
+#define BIT_SET(arg,posn) ((arg) | (1L << (posn)))
+#define BIT_CLR(arg,posn) ((arg) & ~(1L << (posn)))
+#define BIT_TST(arg,posn) BOOL((arg) & (1L << (posn)))
+#define BIT_FLP(arg,posn) ((arg) ^ (1L << (posn)))
 #endif  // AIOC_DEFS_H
