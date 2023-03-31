@@ -1,6 +1,6 @@
 #include <stdio.h>
 
 int main(void) {
-  printf("Hello World\n");
+  aioc_self_test();
   return 0;
 }
