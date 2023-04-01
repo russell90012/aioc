@@ -180,8 +180,6 @@ aioc_error_t aioc_api_single_channel_conversion(
               uint16_t* result)
 {
   aioc_error_t e = error_none;
-  uint32_t convert_id =aioc_ai_info_table[analog_id].gpio_id;
-  uint32_t input = aioc_ai_info_table[analog_id].adc_input;
  
   e = aioc_util_spi_open(
         aioc_ai_info_table[analog_id].spi_dev_id,
@@ -192,6 +190,7 @@ aioc_error_t aioc_api_single_channel_conversion(
   }      
 
   // Issue specific input channel selection command.
+  uint32_t input = aioc_ai_info_table[analog_id].adc_input;
   e = aioc_adc_conversion_mode_command_channel_selection(input);
   if (e)
   {
@@ -201,6 +200,7 @@ aioc_error_t aioc_api_single_channel_conversion(
   // Pulse the appropriate ADC convert signal active (low) for appropriate
   // duration.
   //  CNV Low Time: tCNVL: 80 ns
+  uint32_t convert_id =aioc_ai_info_table[analog_id].gpio_id;
   e = aioc_util_ultrascale_gpio_pulse_low(convert_id, 80);
   if (e)
   {
