@@ -18,7 +18,8 @@ typedef enum  // aioc_error_t
   error_vendor_id_high,
   error_device_type,
   error_register_access,
-  error_adc_init
+  error_adc_init,
+  error_ai_mapping
 }
 aioc_error_t;
 
