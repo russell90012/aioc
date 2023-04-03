@@ -87,8 +87,23 @@
 //==============================================================================
 //==============================================================================
 
-aioc_error_t  aioc_adc_conversion_mode_command_issue(uint32_t command);
+
+
+
+// Issue specific input channel selection command.
+aioc_error_t aioc_adc_conversion_mode_command_channel_selection(
+  uint32_t input);
+
+aioc_error_t aioc_adc_self_check(void);
+aioc_error_t aioc_adc_configure_single_cycle_mode(void);
+aioc_error_t aioc_adc_to_conversion_mode(void);
+aioc_error_t aioc_adc_to_register_mode(void);
+
+
+aioc_error_t aioc_adc_conversion_mode_command_issue(uint32_t command);
 aioc_error_t aioc_adc_conversion_mode_result_read(uint16_t* result);
+
+
 aioc_error_t aioc_adc_register_write(
   uint32_t register_adrs,
   uint8_t* data,
@@ -106,6 +121,125 @@ aioc_error_t aioc_adc_register_read(
 //==============================================================================
 //==============================================================================
 // Public functions.
+//==============================================================================
+//==============================================================================
+aioc_error_t
+aioc_adc_init(aioc_adc_id_t aioc_adc_id, aioc_adc_context_t* aioc_adc_context)
+{
+  aioc_error_t e = error_none;
+
+  // ADC Init: aioc_adc_id_t
+  // TBD
+  //   self_check
+  //   configure
+  //   to conversion mode
+  //   setup mode
+  //   return context.
+  
+  // Perform ADC self-check, configuration, and start conversion mode for all five ADCs.
+  // NOTE: just do 5V for now.
+#if 0
+  e = aioc_util_spi_open(
+        aioc_adc_info_table[AIOC_ADC_ID_5V].spi_dev_id,
+        aioc_adc_info_table[AIOC_ADC_ID_5V].spi_cs_id);
+  if (e)
+  {
+    return e;
+  }
+  
+  // Perform ADC self-check.
+  e = aioc_adc_self_check();  
+  if (e)
+  {
+    return e;
+  }
+ 
+  // Configure the ADC
+  e = aioc_adc_configure_single_cycle_mode();
+  if (e)
+  {
+    return e;
+  }
+  
+  // Start conversion mode.
+  e = aioc_adc_to_conversion_mode();
+  if (e)
+  {
+    return e;
+  }      
+
+  e = aioc_util_spi_close();
+  if (e)
+  {
+    return e;
+  }
+#endif
+  
+  return error_none;
+}
+
+//==============================================================================
+//==============================================================================
+aioc_error_t aioc_adc_convert_single_cycle(
+  aioc_adc_context_t adc_context, 
+  aioc_adc_input_t adc_input)
+{
+#if 0
+  // adc_convert_single_cycle
+  // TBD
+  //   Convert id to context and input.
+  //   Call convert with context and input.
+ e = aioc_util_spi_open(
+        aioc_ai_info_table[analog_id].spi_dev_id,
+        aioc_ai_info_table[analog_id].spi_cs_id);
+  if (e)
+  {
+    return e;
+  }      
+
+  // Issue specific input channel selection command.
+  uint32_t input = aioc_ai_info_table[analog_id].adc_input;
+  e = aioc_adc_conversion_mode_command_channel_selection(input);
+  if (e)
+  {
+    return e;
+  }
+  
+  // Pulse the appropriate ADC convert signal active (low) for appropriate
+  // duration.
+  //  CNV Low Time: tCNVL: 80 ns
+  uint32_t convert_id =aioc_ai_info_table[analog_id].gpio_id;
+  e = aioc_util_ultrascale_gpio_pulse_low(convert_id, 80);
+  if (e)
+  {
+    return e;
+  }
+
+  // Delay for conversion time.
+  //  Conversion Time: tCONVERT: 380-415 ns.
+  aioc_util_delay_ns(500);
+  
+  // Read the conversion result.
+  e = aioc_adc_conversion_mode_result_read(result);
+  if (e)
+  {
+    return e;
+  }
+  
+  e = aioc_util_spi_close();
+  if (e)
+  {
+    return e;
+  }
+#endif
+
+  return error_none;
+}
+
+
+//==============================================================================
+//==============================================================================
+// Private functions.
 //==============================================================================
 //==============================================================================
 
@@ -377,42 +511,6 @@ aioc_error_t aioc_adc_to_register_mode(void)
   if (e)
   {
     return e;
-  }
-  
-  // Check the Device Status Register for spi error.
-  data = 0;
-  e = aioc_adc_register_read(STATUS_adrs, &data, 1);
-  if (e)
-  {
-    return e;
-  }
-  if (STATUS_SPI_ERROR_read(data))
-  {
-    return error_spi_bus;
-  }
-
-  // Check the Vendor ID of the ADC.
-  //  Read vendor id low register and check the id.
-  //  Read vendor id high register and check the id.
-  e = aioc_adc_register_read(VENDOR_L_adrs, &data, 1);
-  if (e)
-  {
-    return e;
-  }
-  if (data != VENDOR_L_reset)
-  {
-    return error_vendor_id_low;
-  }
-  
-  data = 0;
-  aioc_adc_register_read(VENDOR_H_adrs, &data, 1);
-  if (e)
-  {
-    return e;
-  }
-  if (data != VENDOR_H_reset)
-  {
-    return error_vendor_id_high;
   }
 
   return error_none;

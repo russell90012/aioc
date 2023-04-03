@@ -1,6 +1,6 @@
 //==============================================================================
 //==============================================================================
-#include "aioc_api.h"
+#include "aioc.h"
 
 #include "aioc_i2c_gpio.h"
 #include "aioc_util.h"
@@ -8,17 +8,7 @@
 //==============================================================================
 //==============================================================================
 
-typedef enum
-{
-  AIOC_ADC_ID_5V,
-  AIOC_ADC_ID_7V,
-  AIOC_ADC_ID_95mV,
-  AIOC_ADC_ID_RTD,
-  AIOC_ADC_ID_EP10,
-  
-  NUMBER_OF_AIOC_ADC_ID
-}
-aioc_adc_id_t;
+static aioc_adc_context_t aioc_adc_context_5v = 0;
 
 
 // SPI device id and cs table
@@ -95,8 +85,12 @@ aioc_ai_info_t  aioc_ai_info_table[] =
 // Private functions declarations.
 //==============================================================================
 //==============================================================================
-aioc_error_t aioc_api_adc_reset_all(void);
+aioc_error_t aioc_reset_all_adc(void);
 
+aioc_error_t aioc_map_analog_id_to_context(
+              aioc_analog_id_t analog_id,
+              aioc_adc_context_t* adc_context,
+              aioc_adc_input_t* adc_input);
 //==============================================================================
 //==============================================================================
 
@@ -114,10 +108,10 @@ aioc_error_t aioc_api_adc_reset_all(void);
  * standard (non-bit) inputs.
  */
 //==============================================================================
-aioc_error_t aioc_api_init(void)
+aioc_error_t aioc_init(void)
 {
   aioc_error_t e = error_none;
-  
+
   // Configure the AIOC i2c GPIO.
   e = aioc_i2c_gpio_configure();
   if (e)
@@ -126,105 +120,46 @@ aioc_error_t aioc_api_init(void)
   }
 
   // Reset the ADCs
-  e = aioc_api_adc_reset_all();
+  e = aioc_reset_all_adc();
   if (e)
   {
     return e;
   }
-  
-  // Perform ADC self-check, configuration, and start conversion mode for all five ADCs.
-  // NOTE: just do 5V for now.
-  e = aioc_util_spi_open(
-        aioc_adc_info_table[AIOC_ADC_ID_5V].spi_dev_id,
-        aioc_adc_info_table[AIOC_ADC_ID_5V].spi_cs_id);
-  if (e)
-  {
-    return e;
-  }      
-  
-  // Perform ADC self-check.
-  e = aioc_adc_self_check();  
-  if (e)
-  {
-    return e;
-  }
- 
-  // Configure the ADC
-  e = aioc_adc_configure_single_cycle_mode();
-  if (e)
-  {
-    return e;
-  }
-  
-  // Start conversion mode.
-  e = aioc_adc_to_conversion_mode();
-  if (e)
-  {
-    return e;
-  }      
 
-  e = aioc_util_spi_close();
+  // Initialize an ADC.
+  e = aioc_adc_init(AIOC_ADC_ID_5V, &aioc_adc_context_5v);
   if (e)
   {
-    return e;
-  }      
- 
+    return error_adc_init;
+  }
+
   return error_none;
 }
 
 
 //==============================================================================
 //==============================================================================
-aioc_error_t aioc_api_single_channel_conversion(
+aioc_error_t aioc_analog_input_conversion(
               aioc_analog_id_t analog_id, 
               uint16_t* result)
 {
   aioc_error_t e = error_none;
- 
-  e = aioc_util_spi_open(
-        aioc_ai_info_table[analog_id].spi_dev_id,
-        aioc_ai_info_table[analog_id].spi_cs_id);
+
+  aioc_adc_context_t adc_context = 0;
+  aioc_adc_input_t adc_input = 0;
+  
+  e = aioc_map_analog_id_to_context(analog_id, &adc_context, &adc_input);
   if (e)
   {
     return e;
   }      
 
-  // Issue specific input channel selection command.
-  uint32_t input = aioc_ai_info_table[analog_id].adc_input;
-  e = aioc_adc_conversion_mode_command_channel_selection(input);
+  e = aioc_adc_convert_single_cycle(adc_context, adc_input);
   if (e)
   {
     return e;
-  }
-  
-  // Pulse the appropriate ADC convert signal active (low) for appropriate
-  // duration.
-  //  CNV Low Time: tCNVL: 80 ns
-  uint32_t convert_id =aioc_ai_info_table[analog_id].gpio_id;
-  e = aioc_util_ultrascale_gpio_pulse_low(convert_id, 80);
-  if (e)
-  {
-    return e;
-  }
+  }      
 
-  // Delay for conversion time.
-  //  Conversion Time: tCONVERT: 380-415 ns.
-  aioc_util_delay_ns(500);
-  
-  // Read the conversion result.
-  e = aioc_adc_conversion_mode_result_read(result);
-  if (e)
-  {
-    return e;
-  }
-  
-  e = aioc_util_spi_close();
-  if (e)
-  {
-    return e;
-  }
-    
-  // return conversion.
   return error_none;
 }
 
@@ -237,7 +172,7 @@ aioc_error_t aioc_api_single_channel_conversion(
 
 //==============================================================================
 //==============================================================================
-aioc_error_t aioc_api_adc_reset_all(void)
+aioc_error_t aioc_reset_all_adc(void)
 {
   aioc_error_t e = error_none;
 
@@ -285,6 +220,18 @@ aioc_error_t aioc_api_adc_reset_all(void)
   return error_none;
 }
 
+//==============================================================================
+//==============================================================================
+aioc_error_t aioc_map_analog_id_to_context(
+              aioc_analog_id_t analog_id,
+              aioc_adc_context_t* adc_context,
+              aioc_adc_input_t* adc_input)
+{
+  // TBD
+  
+  return error_none;
+}
+  
 
 
 

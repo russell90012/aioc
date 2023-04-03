@@ -17,11 +17,17 @@ typedef enum  // aioc_error_t
   error_vendor_id_low,
   error_vendor_id_high,
   error_device_type,
-  error_register_access
+  error_register_access,
+  error_adc_init
 }
 aioc_error_t;
 
-typedef  unsigned int  xaioc_error_t;
 
+#define BOOL(x) (!(!(x)))
+
+#define BIT_SET(arg,posn) ((arg) | (1L << (posn)))
+#define BIT_CLR(arg,posn) ((arg) & ~(1L << (posn)))
+#define BIT_TST(arg,posn) BOOL((arg) & (1L << (posn)))
+#define BIT_FLP(arg,posn) ((arg) ^ (1L << (posn)))
 
 #endif  // AIOC_DEFS_H

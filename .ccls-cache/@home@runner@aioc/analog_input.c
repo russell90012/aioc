@@ -24,7 +24,7 @@
  *  8/21/12  1446   J. Squiers   Corrected spacing to match standards
  *
  ******************************************************************************/
-#if	1
+
 /*******************************************************************************
  *                             # I n c l u d e s                               *
  ******************************************************************************/
@@ -32,7 +32,7 @@
 
 #include "aioc_defs.h"
 
-#include "aioc_api.h"
+#include "aioc.h"
 
 enum
 {
@@ -294,7 +294,7 @@ UINT16 SampleOneAnalogInput(GENERIC_ANALOG_IN_TYPE analogID)
     return 0;
   }
   
-  e = aioc_api_single_channel_conversion(analog_id, &result);
+  e = aioc_analog_input_conversion(analog_id, &result);
   if (e)
   {
     return 0;
@@ -304,4 +304,3 @@ UINT16 SampleOneAnalogInput(GENERIC_ANALOG_IN_TYPE analogID)
   return (result);
 }
 
-#endif

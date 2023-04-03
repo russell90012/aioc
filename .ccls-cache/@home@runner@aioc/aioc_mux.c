@@ -10,16 +10,8 @@
 // 0   0   1   1              External lines
 // 0   1   1   2              BIT Low lines
 // 1   0   1   3              BIT High lines
-// 1   1   1   4
+// 1   1   1   4              NA
 // X is don’t care.
-
-typedef struct
-{
-
-}
-aioc_mux_switch_t;
-
-aioc_mux_switch_t aioc_mux_switch_table[0][0];
 
 //==============================================================================
 //==============================================================================
@@ -28,25 +20,33 @@ aioc_error_t aioc_mux_switch_lines(
               aioc_mux_lines_t aioc_mux_lines)
 {
   aioc_error_t e = error_none;
-  i2c_gpio_pin_name_t pin_name = 0;
-  uint32_t level = 0;
   
-  // Lets start with ASC 5V, BIT High.
   switch (aioc_mux_banks)
   {
     case AIOC_MUX_BANKS_5V:
       switch (aioc_mux_lines)
       {
-        case AIOC_MUX_LINES_BIT_HIGH:
+        case AIOC_MUX_LINES_EXTERNAL:
+          aioc_i2c_gpio_pin_level_set(A5V_SW_BANK1_A0, 0);
+          aioc_i2c_gpio_pin_level_set(A5V_SW_BANK2_A0, 0);
+          aioc_i2c_gpio_pin_level_set(A5V_SW_BANK1_A1, 0);
+          aioc_i2c_gpio_pin_level_set(A5V_SW_BANK2_A1, 0);
           break;
-      }
-      break;
+        case AIOC_MUX_LINES_BIT_LOW:
+          aioc_i2c_gpio_pin_level_set(A5V_SW_BANK1_A0, 1);
+          aioc_i2c_gpio_pin_level_set(A5V_SW_BANK2_A0, 1);
+          aioc_i2c_gpio_pin_level_set(A5V_SW_BANK1_A1, 0);
+          aioc_i2c_gpio_pin_level_set(A5V_SW_BANK2_A1, 0);
+          break;
+        case AIOC_MUX_LINES_BIT_HIGH:
+          aioc_i2c_gpio_pin_level_set(A5V_SW_BANK1_A0, 0);
+          aioc_i2c_gpio_pin_level_set(A5V_SW_BANK2_A0, 0);
+          aioc_i2c_gpio_pin_level_set(A5V_SW_BANK1_A1, 1);
+          aioc_i2c_gpio_pin_level_set(A5V_SW_BANK2_A1, 1);
+          break;
+     }
+     break;
   }
-  e = aioc_i2c_gpio_pin_level_set(pin_name,  level);
-  if (e)
-  {
-    
-  }
-  
+ 
   return error_none;
 }

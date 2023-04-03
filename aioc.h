@@ -69,10 +69,10 @@ aioc_analog_id_t;
  * standard (non-bit) inputs.
  */
 aioc_error_t
-aioc_api_init(void);
+aioc_init(void);
 
 aioc_error_t
-aioc_api_single_channel_conversion(
+aioc_analog_input_conversion(
   aioc_analog_id_t analog_id,
   uint16_t* result);
 

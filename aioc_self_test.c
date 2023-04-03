@@ -3,7 +3,7 @@
 #include <stdio.h>
 
 
-#include "aioc_api.h"
+#include "aioc.h"
 
 #include "aioc_mux.h"
 
@@ -63,8 +63,8 @@ aioc_error_t aioc_self_test(void)
 
   printf("%s: initializing aioc_api.\n", __FUNCTION__);
   
-  // Initialize the board devices.
-  e = aioc_api_init();
+  // Initialize the board.
+  e = aioc_init();
   if (e)
   {
     return e;
@@ -82,7 +82,7 @@ aioc_error_t aioc_self_test(void)
     printf("%s: switching in the BIT HIGH inputs.\n", __FUNCTION__);
     
     // Multiplex in the BIT High inputs for 5V adc.
-    e = aioc_mux_switch_lines(AIOC_MUX_LINES_BIT_HIGH, AIOC_MUX_BANKS_5V);
+    e = aioc_mux_switch_lines(AIOC_MUX_BANKS_5V, AIOC_MUX_LINES_BIT_HIGH);
     if (e)
     {
       return e;
@@ -96,7 +96,7 @@ aioc_error_t aioc_self_test(void)
       printf("%s: processing analog input: %s\n",
         __FUNCTION__,
         aioc_ai_names[i]);
-      e = aioc_api_single_channel_conversion(test_table[i].ai_id, &result);
+      e = aioc_analog_input_conversion(test_table[i].ai_id, &result);
       if (e)
       {
         return e;
@@ -110,7 +110,6 @@ aioc_error_t aioc_self_test(void)
       if (result < A5V_H_BIT_lower_limit || result > A5V_H_BIT_upper_limit)
       {
         printf("%s: result out of range, exiting.\n", __FUNCTION__);
-        break;
       }
       else
       {

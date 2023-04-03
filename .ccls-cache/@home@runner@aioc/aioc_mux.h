@@ -15,7 +15,7 @@ typedef enum
 {
   AIOC_MUX_LINES_EXTERNAL = 0,
   AIOC_MUX_LINES_BIT_LOW,
-  AIOC_MUX_LINES_BIT_HIGH,
+  AIOC_MUX_LINES_BIT_HIGH
 }
 aioc_mux_lines_t;
 
