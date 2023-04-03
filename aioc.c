@@ -216,6 +216,7 @@ aioc_error_t map_ai_to_adc_handle_and_input(
     //A5V_SPARE_1                         = A5V_11_MON
     //A5V_SPARE_2                       = A5V_12_MON;
     
+#if  0
     // AI Analog 0-7 VDC
     case AIOC_AI_PROBE1_RIGHT_FWD_FUEL_QUANTITY:
     
@@ -262,12 +263,17 @@ aioc_error_t map_ai_to_adc_handle_and_input(
     case AIOC_AI_NGB1_OIL_FILTER_TEMPERATURE:
     
     case AIOC_AI_NGB3_OIL_FILTER_TEMPERATURE:
-      
+#endif
+    
     default:
       e = error_ai_mapping;
+      return e;
     }
+  
+  *adc_input = input;
+  *adc_handle = handle;
 
-  return e;
+  return error_none;
 }
   
 

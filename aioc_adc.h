@@ -18,9 +18,6 @@ typedef enum
 }
 aioc_adc_id_t;
 
-typedef void* aioc_adc_handle_t;
-
-
 typedef enum
 {
   // AI Analog 0-5 VDC
@@ -39,6 +36,9 @@ typedef enum
   A5V_12_MON
 }
 aioc_adc_input_t;
+
+typedef void* aioc_adc_handle_t;
+
 
 //==============================================================================
 //==============================================================================
