@@ -86,12 +86,12 @@ aioc_ai_info_t  aioc_ai_info_table[] =
 //==============================================================================
 aioc_error_t aioc_reset_all_adc(void);
 
-aioc_error_t map_ai_to_adc_context_and_input(
+aioc_error_t map_ai_to_adc_handle_and_input(
               aioc_analog_id_t analog_id,
-              aioc_adc_context_t* adc_context,
+              aioc_adc_handle_t* adc_handle,
               aioc_adc_input_t* adc_input);
 
-static aioc_adc_context_t aioc_adc_context_5v = 0;
+static aioc_adc_handle_t aioc_adc_handle_5v = 0;
 
 //==============================================================================
 //==============================================================================
@@ -129,7 +129,7 @@ aioc_error_t aioc_init(void)
   }
 
   // Initialize an ADC.
-  e = aioc_adc_init(AIOC_ADC_ID_5V, &aioc_adc_context_5v);
+  e = aioc_adc_init(AIOC_ADC_ID_5V, &aioc_adc_handle_5v);
   if (e)
   {
     return error_adc_init;
@@ -147,16 +147,16 @@ aioc_error_t aioc_analog_input_conversion(
 {
   aioc_error_t e = error_none;
 
-  aioc_adc_context_t adc_context = 0;
+  aioc_adc_handle_t adc_handle = 0;
   aioc_adc_input_t adc_input = 0;
   
-  e = map_ai_to_adc_context_and_input(analog_id, &adc_context, &adc_input);
+  e = map_ai_to_adc_handle_and_input(analog_id, &adc_handle, &adc_input);
   if (e)
   {
     return e;
   }      
 
-  e = aioc_adc_convert_single_cycle(adc_context, adc_input);
+  e = aioc_adc_convert_single_cycle(adc_handle, adc_input);
   if (e)
   {
     return e;
@@ -224,36 +224,36 @@ aioc_error_t aioc_reset_all_adc(void)
 
 //==============================================================================
 //==============================================================================
-aioc_error_t map_ai_to_adc_context_and_input(
+aioc_error_t map_ai_to_adc_handle_and_input(
               aioc_analog_id_t analog_id,
-              aioc_adc_context_t* adc_context,
+              aioc_adc_handle_t* adc_handle,
               aioc_adc_input_t* adc_input)
 {
   aioc_error_t e = error_none;
   aioc_adc_input_t input = 0;
-  aioc_adc_context_t context = 0;
+  aioc_adc_handle_t handle = 0;
 
   switch(analog_id)
   { 
     // AI Analog 0-5 VDC
     case AIOC_AI_LEFT_FWD_OVER_PRESSURE_SENSOR:
       input = A5V_00_MON;
-      context = aioc_adc_context_5v;
+      handle = aioc_adc_handle_5v;
       break;
     
     case AIOC_AI_LEFT_AFT_OVER_PRESSURE_SENSOR:
       input = A5V_01_MON;
-      context = aioc_adc_context_5v;
+      handle = aioc_adc_handle_5v;
       break;
     
     case AIOC_AI_RIGHT_FWD_OVER_PRESSURE_SENSOR:
       input = A5V_02_MON;
-      context = aioc_adc_context_5v;
+      handle = aioc_adc_handle_5v;
       break;
     
     case AIOC_AI_RIGHT_AFT_OVER_PRESSURE_SENSOR:
       input = A5V_03_MON;
-      context = aioc_adc_context_5v;
+      handle = aioc_adc_handle_5v;
       break;
     
     // NOT DOING THESE FOR NOW
@@ -263,22 +263,22 @@ aioc_error_t map_ai_to_adc_context_and_input(
 
     case AIOC_AI_AFT_RIGHT_FEEDPIPE_PRESSURE_SENSOR:
       input = A5V_07_MON;
-      context = aioc_adc_context_5v;
+      handle = aioc_adc_handle_5v;
       break;
     
     case AIOC_AI_FWD_LEFT_FEEDPIPE_PRESSURE_SENSOR:
       input = A5V_08_MON;
-      context = aioc_adc_context_5v;
+      handle = aioc_adc_handle_5v;
       break;
     
     case AIOC_AI_AFT_LEFT_FEEDPIPE_PRESSURE_SENSOR:
       input = A5V_09_MON;
-      context = aioc_adc_context_5v;
+      handle = aioc_adc_handle_5v;
       break;
     
     case AIOC_AI_FWD_RIGHT_FEEDPIPE_PRESSURE_SENSOR:
       input = A5V_10_MON;
-      context = aioc_adc_context_5v;
+      handle = aioc_adc_handle_5v;
       break;
 
     // NOT DOING THESE FOR NOW

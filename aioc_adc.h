@@ -14,11 +14,12 @@ typedef enum
   AIOC_ADC_ID_RTD,
   AIOC_ADC_ID_EP10,
   
-  NUMBER_OF_AIOC_ADC_ID
+  NUMBER_OF_AIOC_ADC_IDS
 }
 aioc_adc_id_t;
 
-typedef void* aioc_adc_context_t;
+typedef void* aioc_adc_handle_t;
+
 
 typedef enum
 {
@@ -36,7 +37,6 @@ typedef enum
   A5V_10_MON,
   A5V_11_MON,
   A5V_12_MON
-  
 }
 aioc_adc_input_t;
 
@@ -46,12 +46,13 @@ aioc_adc_input_t;
 //==============================================================================
 //==============================================================================
 aioc_error_t
-aioc_adc_init(aioc_adc_id_t, aioc_adc_context_t* aioc_adc_context);
+aioc_adc_init(aioc_adc_id_t aioc_adc_id, aioc_adc_handle_t* aioc_adc_handle);
 
 aioc_error_t
 aioc_adc_convert_single_cycle(
-  aioc_adc_context_t adc_context, 
-  aioc_adc_input_t adc_input);
+  aioc_adc_handle_t adc_handle, 
+  aioc_adc_input_t adc_input,
+  uint16_t* result);
 
 
 

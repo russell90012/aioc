@@ -10,6 +10,12 @@
 //==============================================================================
 
 
+//==============================================================================
+//==============================================================================
+// Private functions declarations, macro definitions, data, etc.
+//==============================================================================
+//==============================================================================
+
 #define VENDOR_L_adrs   0x000C
 #define VENDOR_L_reset  0x56
 
@@ -81,12 +87,6 @@
 //==============================================================================
 //==============================================================================
 
-//==============================================================================
-//==============================================================================
-// Private functions declarations.
-//==============================================================================
-//==============================================================================
-
 
 
 
@@ -114,6 +114,34 @@ aioc_error_t aioc_adc_register_read(
   uint8_t* data,
   uint32_t data_count);
 
+
+typedef enum
+{
+  AIOC_ADC_STATE_RESET = 0,
+  AIOC_ADC_STATE_REGISTER_MODE = 1,
+  AIOC_ADC_STATE_CONVERSION_MODE
+}
+aioc_adc_state_t;
+
+typedef struct
+{
+  aioc_adc_state_t state;
+  uint32_t spi_dev_id;
+  uint32_t spi_cs_id;
+  uint32_t gpio_id;
+}
+aioc_adc_context_t;
+
+aioc_adc_context_t aioc_adc_context_table[NUMBER_OF_AIOC_ADC_IDS] =
+{
+  {AIOC_ADC_STATE_RESET, 0, 0, 0}, // AIOC_ADC_ID_5V
+  {AIOC_ADC_STATE_RESET, 0, 1, 0}, // AIOC_ADC_ID_7V
+  {AIOC_ADC_STATE_RESET, 1, 0, 1}, // AIOC_ADC_ID_95mV
+  {AIOC_ADC_STATE_RESET, 1, 1, 1}, // AIOC_ADC_ID_RTD
+  {AIOC_ADC_STATE_RESET, 1, 2, 1}  // AIOC_ADC_ID_EP10
+};
+
+
 //==============================================================================
 //==============================================================================
 
@@ -123,25 +151,32 @@ aioc_error_t aioc_adc_register_read(
 // Public functions.
 //==============================================================================
 //==============================================================================
+
+
+//==============================================================================
+// Perform ADC self-check, configuration, and start conversion mode for this ADC.
+// And return handle to this ADC.
+//==============================================================================
 aioc_error_t
-aioc_adc_init(aioc_adc_id_t aioc_adc_id, aioc_adc_context_t* aioc_adc_context)
+aioc_adc_init(aioc_adc_id_t aioc_adc_id, aioc_adc_handle_t* aioc_adc_handle)
 {
   aioc_error_t e = error_none;
 
-  // ADC Init: aioc_adc_id_t
-  // TBD
-  //   self_check
-  //   configure
-  //   to conversion mode
-  //   setup mode
-  //   return context.
+  *aioc_adc_handle = 0;
+ 
+  if (aioc_adc_id >= NUMBER_OF_AIOC_ADC_IDS)
+  {
+    return error_adc_init;
+  }
+
+  aioc_adc_context_t* aioc_adc_context =  &aioc_adc_context_table[aioc_adc_id];
+
+  aioc_adc_context->state = AIOC_ADC_STATE_REGISTER_MODE;
+
   
-  // Perform ADC self-check, configuration, and start conversion mode for all five ADCs.
-  // NOTE: just do 5V for now.
-#if 0
   e = aioc_util_spi_open(
-        aioc_adc_info_table[AIOC_ADC_ID_5V].spi_dev_id,
-        aioc_adc_info_table[AIOC_ADC_ID_5V].spi_cs_id);
+        aioc_adc_context->spi_dev_id,
+        aioc_adc_context->spi_cs_id);
   if (e)
   {
     return e;
@@ -167,39 +202,39 @@ aioc_adc_init(aioc_adc_id_t aioc_adc_id, aioc_adc_context_t* aioc_adc_context)
   {
     return e;
   }      
-
+  aioc_adc_context->state = AIOC_ADC_STATE_CONVERSION_MODE;
+    
   e = aioc_util_spi_close();
   if (e)
   {
     return e;
   }
-#endif
   
+ *aioc_adc_handle = (aioc_adc_handle_t)aioc_adc_context;
+ 
   return error_none;
 }
 
 //==============================================================================
 //==============================================================================
 aioc_error_t aioc_adc_convert_single_cycle(
-  aioc_adc_context_t adc_context, 
-  aioc_adc_input_t adc_input)
+  aioc_adc_handle_t adc_handle,
+  aioc_adc_input_t adc_input,
+  uint16_t* result)
 {
-#if 0
-  // adc_convert_single_cycle
-  // TBD
-  //   Convert id to context and input.
-  //   Call convert with context and input.
- e = aioc_util_spi_open(
-        aioc_ai_info_table[analog_id].spi_dev_id,
-        aioc_ai_info_table[analog_id].spi_cs_id);
+  aioc_error_t e = error_none;
+  aioc_adc_context_t* aioc_adc_context = (aioc_adc_context_t*)adc_handle;
+
+  e = aioc_util_spi_open(
+        aioc_adc_context->spi_dev_id,
+        aioc_adc_context->spi_cs_id);
   if (e)
   {
     return e;
-  }      
+  }
 
   // Issue specific input channel selection command.
-  uint32_t input = aioc_ai_info_table[analog_id].adc_input;
-  e = aioc_adc_conversion_mode_command_channel_selection(input);
+  e = aioc_adc_conversion_mode_command_channel_selection(adc_input);
   if (e)
   {
     return e;
@@ -208,7 +243,7 @@ aioc_error_t aioc_adc_convert_single_cycle(
   // Pulse the appropriate ADC convert signal active (low) for appropriate
   // duration.
   //  CNV Low Time: tCNVL: 80 ns
-  uint32_t convert_id =aioc_ai_info_table[analog_id].gpio_id;
+  uint32_t convert_id = aioc_adc_context->gpio_id;
   e = aioc_util_ultrascale_gpio_pulse_low(convert_id, 80);
   if (e)
   {
@@ -231,7 +266,6 @@ aioc_error_t aioc_adc_convert_single_cycle(
   {
     return e;
   }
-#endif
 
   return error_none;
 }

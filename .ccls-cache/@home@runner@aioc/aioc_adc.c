@@ -124,9 +124,18 @@ aioc_error_t aioc_adc_register_read(
 //==============================================================================
 //==============================================================================
 aioc_error_t
-aioc_adc_init(aioc_adc_id_t aioc_adc_id, aioc_adc_context_t* aioc_adc_context)
+aioc_adc_init(aioc_adc_id_t aioc_adc_id, aioc_adc_handle_t* aioc_adc_handle)
 {
   aioc_error_t e = error_none;
+
+  if (aioc_adc_id >= NUMBER_OF_AIOC_ADC_IDS)
+  if (NUMBER_OF_AIOC_ADC_IDS < aioc_adc_id)
+  {
+    return error_adc_init;
+  }
+
+  *aioc_adc_handle = (aioc_adc_handle_t)0;  // TBD
+  
 
   // ADC Init: aioc_adc_id_t
   // TBD
@@ -135,6 +144,7 @@ aioc_adc_init(aioc_adc_id_t aioc_adc_id, aioc_adc_context_t* aioc_adc_context)
   //   to conversion mode
   //   setup mode
   //   return context.
+
   
   // Perform ADC self-check, configuration, and start conversion mode for all five ADCs.
   // NOTE: just do 5V for now.
