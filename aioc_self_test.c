@@ -1,60 +1,64 @@
-//==============================================================================
-//==============================================================================
-#include <stdio.h>
+// MERCURY HEADER GOES HERE
+// TBD
 
 
 #include "aioc.h"
-
 #include "aioc_mux.h"
 
+#include <stdio.h>
 
-//==============================================================================
-//==============================================================================
+
+//==========================
+// Private definitions.
+//==========================
+
+static const float  A5V_H_BIT_VOLTAGE = 3.333;
+static const float  A5V_H_BIT_VOLTAGE_TOLERANCE = A5V_H_BIT_VOLTAGE/10.0;
+static const float  ADC_FULL_SCALE_VOLTAGE = 5.0;
+static const int    ADC_FULL_SCALE_VALUE = 0xFFFF;
+   
+static const uint16_t A5V_H_BIT_upper_limit  = 
+    (uint16_t)((float)(((A5V_H_BIT_VOLTAGE + A5V_H_BIT_VOLTAGE_TOLERANCE) *
+    ((float)ADC_FULL_SCALE_VALUE))/ADC_FULL_SCALE_VOLTAGE));
+static const uint16_t A5V_H_BIT_lower_limit  =
+    (uint16_t)((float)(((A5V_H_BIT_VOLTAGE - A5V_H_BIT_VOLTAGE_TOLERANCE) *
+    ((float)ADC_FULL_SCALE_VALUE))/ADC_FULL_SCALE_VOLTAGE));
+
+
 typedef struct
 {
   aioc_analog_id_t ai_id;
-  uint16_t upper_limit;
-  uint16_t lower_limit;
+  uint16_t extern_upper_limit;
+  uint16_t extern_lower_limit;
+  uint16_t bit_h_upper_limit;
+  uint16_t bit_h_lower_limit;
+  uint16_t bit_l_upper_limit;
+  uint16_t bit_l_lower_limit;
+  char *   name;
 }
 aioc_test_table_entry_t;
 
 static aioc_test_table_entry_t aioc_test_table[] =
 // TBD
 {
-  {AIOC_AI_LEFT_FWD_OVER_PRESSURE_SENSOR, 0, 0},
+  {AIOC_AI_LEFT_FWD_OVER_PRESSURE_SENSOR,
+    0, 0,  A5V_H_BIT_upper_limit, A5V_H_BIT_lower_limit,  0, 0,
+    "AIOC_AI_LEFT_FWD_OVER_PRESSURE_SENSOR"},
 #if 0
-  {AIOC_AI_LEFT_AFT_OVER_PRESSURE_SENSOR, 0, 0},
-  {AIOC_AI_RIGHT_FWD_OVER_PRESSURE_SENSOR, 0, 0},
-  {AIOC_AI_RIGHT_AFT_OVER_PRESSURE_SENSOR, 0, 0},
-  {AIOC_AI_AFT_RIGHT_FEEDPIPE_PRESSURE_SENSOR, 0, 0},
-  {AIOC_AI_FWD_LEFT_FEEDPIPE_PRESSURE_SENSOR, 0, 0},
-  {AIOC_AI_AFT_LEFT_FEEDPIPE_PRESSURE_SENSOR, 0, 0},
-  {AIOC_AI_FWD_RIGHT_FEEDPIPE_PRESSURE_SENSOR, 0, 0}
+  {AIOC_AI_LEFT_AFT_OVER_PRESSURE_SENSOR,       0, 0, A5V_H_BIT_upper_limit, A5V_H_BIT_lower_limit,  0, 0,  "AIOC_AI_LEFT_AFT_OVER_PRESSURE_SENSOR"},
+  {AIOC_AI_RIGHT_FWD_OVER_PRESSURE_SENSOR,      0, 0,  A5V_H_BIT_upper_limit, A5V_H_BIT_lower_limit,  0, 0,  "AIOC_AI_RIGHT_FWD_OVER_PRESSURE_SENSOR"},
+  {AIOC_AI_RIGHT_AFT_OVER_PRESSURE_SENSOR,      0, 0,  A5V_H_BIT_upper_limit, A5V_H_BIT_lower_limit,  0, 0,  "AIOC_AI_RIGHT_AFT_OVER_PRESSURE_SENSOR"},
+  {AIOC_AI_AFT_RIGHT_FEEDPIPE_PRESSURE_SENSOR,  0, 0,  A5V_H_BIT_upper_limit, A5V_H_BIT_lower_limit,  0, 0,  "AIOC_AI_AFT_RIGHT_FEEDPIPE_PRESSURE_SENSOR"},
+  {AIOC_AI_FWD_LEFT_FEEDPIPE_PRESSURE_SENSOR,   0, 0,  A5V_H_BIT_upper_limit, A5V_H_BIT_lower_limit,  0, 0,  "AIOC_AI_FWD_LEFT_FEEDPIPE_PRESSURE_SENSOR"},
+  {AIOC_AI_AFT_LEFT_FEEDPIPE_PRESSURE_SENSOR,   0, 0,  A5V_H_BIT_upper_limit, A5V_H_BIT_lower_limit,  0, 0,  "AIOC_AI_AFT_LEFT_FEEDPIPE_PRESSURE_SENSOR"},
+  {AIOC_AI_FWD_RIGHT_FEEDPIPE_PRESSURE_SENSOR,  0, 0,  A5V_H_BIT_upper_limit, A5V_H_BIT_lower_limit,  0, 0,  "AIOC_AI_FWD_RIGHT_FEEDPIPE_PRESSURE_SENSOR"}
 #endif
 };
 
-static char* aioc_ai_names[] =
-{
-  "AIOC_AI_LEFT_FWD_OVER_PRESSURE_SENSOR",
-  "AIOC_AI_LEFT_AFT_OVER_PRESSURE_SENSOR"
-  "AIOC_AI_RIGHT_FWD_OVER_PRESSURE_SENSOR",
-  "AIOC_AI_RIGHT_AFT_OVER_PRESSURE_SENSOR",
-  "AIOC_AI_AFT_RIGHT_FEEDPIPE_PRESSURE_SENSOR",
-  "AIOC_AI_FWD_LEFT_FEEDPIPE_PRESSURE_SENSOR",
-  "AIOC_AI_AFT_LEFT_FEEDPIPE_PRESSURE_SENSOR",
-  "AIOC_AI_FWD_RIGHT_FEEDPIPE_PRESSURE_SENSOR"
-};
 
-const float  A5V_H_BIT_VOLTAGE = 3.333;
-const float  A5V_H_BIT_VOLTAGE_TOLERANCE = A5V_H_BIT_VOLTAGE/10.0;
-const float  ADC_FULL_SCALE_VOLTAGE = 5.0;
-const int    ADC_FULL_SCALE_VALUE = 0xFFFF;
-   
-const uint16_t A5V_H_BIT_upper_limit  = 
-(uint16_t)((float)(((A5V_H_BIT_VOLTAGE + A5V_H_BIT_VOLTAGE_TOLERANCE) * ((float)ADC_FULL_SCALE_VALUE))/ADC_FULL_SCALE_VOLTAGE));
-const uint16_t A5V_H_BIT_lower_limit  =
-(uint16_t)((float)(((A5V_H_BIT_VOLTAGE - A5V_H_BIT_VOLTAGE_TOLERANCE) * ((float)ADC_FULL_SCALE_VALUE))/ADC_FULL_SCALE_VOLTAGE));
-
+//==========================
+// Public definitions.
+//==========================
 
 //==============================================================================
 //==============================================================================
@@ -76,6 +80,7 @@ aioc_error_t aioc_self_test(void)
     uint32_t test_table_length =
                 sizeof(aioc_test_table)/
                 sizeof(*aioc_test_table);
+
     uint32_t i = 0;
     
     printf("%s: switching in the BIT HIGH inputs.\n", __FUNCTION__);
@@ -91,16 +96,18 @@ aioc_error_t aioc_self_test(void)
     {  
       printf("%s: processing analog input: %s\n",
         __FUNCTION__,
-        aioc_ai_names[i]);
+        test_table[i].name);
       e = aioc_analog_input_conversion(test_table[i].ai_id, &result);
       if (e)  {  return e;  }
+      
       printf("%s: checking result %x, upper limit %x, lower limit %x\n",
         __FUNCTION__,
         result,
-        A5V_H_BIT_lower_limit,
-        A5V_H_BIT_upper_limit);
+        test_table[i].bit_h_upper_limit,
+        test_table[i].bit_h_lower_limit);
 
-      if (result < A5V_H_BIT_lower_limit || result > A5V_H_BIT_upper_limit)
+      if (result < test_table[i].bit_h_lower_limit ||
+          result > test_table[i].bit_h_upper_limit)
       {
         printf("%s: result out of range, exiting.\n", __FUNCTION__);
       }
@@ -108,8 +115,8 @@ aioc_error_t aioc_self_test(void)
       {
         printf("%s: result in range, continuing\n", __FUNCTION__);      
       }
-      
     }
+
     printf("%s: done.\n", __FUNCTION__);
   }  
   return error_none;

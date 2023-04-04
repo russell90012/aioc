@@ -14,7 +14,6 @@
 #include "aioc_defs.h"
 
 
-
 /**
  * The current list of AIOC analog input ids.
  */
@@ -71,8 +70,7 @@ aioc_analog_id_t;
  *
  * @return error handling result code.
  */
-aioc_error_t
-aioc_init(void);
+aioc_error_t aioc_init(void);
 
 /**
  * Perform a single-cycle mode adc conversion for analog input and return the 
@@ -84,8 +82,7 @@ aioc_init(void);
  *
  * @return error handling result code.
  */
-aioc_error_t
-aioc_analog_input_conversion(
+aioc_error_t aioc_analog_input_conversion(
   aioc_analog_id_t analog_id,
   uint16_t* result);
 

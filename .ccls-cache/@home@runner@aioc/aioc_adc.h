@@ -1,10 +1,19 @@
 #ifndef  AIOC_ADC_H
 #define AIOC_ADC_H
 
-//==============================================================================
-//==============================================================================
+// MERCURY HEADER GOES HERE
+// TBD
+
+/**
+ * @file:    aioc_adc.h
+ * @author:  Russell Shahenian
+ * @since:   4/4/23
+ * @brief:   This file contains the top level public AIOC adc module
+ *           specifications.
+ */
 
 #include "aioc_defs.h"
+
 
 typedef enum
 {
@@ -40,21 +49,35 @@ aioc_adc_input_t;
 typedef void* aioc_adc_handle_t;
 
 
-//==============================================================================
-//==============================================================================
-// Public functions declarations.
-//==============================================================================
-//==============================================================================
-aioc_error_t
-aioc_adc_init(aioc_adc_id_t aioc_adc_id, aioc_adc_handle_t* aioc_adc_handle);
+/**
+ * Perform ADC self-check, configuration, and start conversion mode for
+ * this ADC.  And return handle to this ADC.
+ *
+ * @param aioc_adc_id is the ADC that gets initialized.
+ *
+ * @param aioc_adc_handle is the handle for this ADC that is passed back to
+ *        the caller.
+ *
+ * @return error handling result code.
+ */
+aioc_error_t aioc_adc_init(
+  aioc_adc_id_t aioc_adc_id,
+  aioc_adc_handle_t* aioc_adc_handle);
 
-aioc_error_t
-aioc_adc_convert_single_cycle(
+/**
+ * Perform a single-cycle mode adc conversion for for the specified input
+ * on the ADC specified by the handle.
+ *
+ * @param adc_handle is handle relevent to the ADC performing the conversion.
+ *
+ * @param adc_input is the input on the ADC that's getting converted.
+ *
+ * @return error handling result code.
+ */
+aioc_error_t aioc_adc_convert_single_cycle(
   aioc_adc_handle_t adc_handle, 
   aioc_adc_input_t adc_input,
   uint16_t* result);
-
-
 
 
 #endif  // AIOC_ADC_H
