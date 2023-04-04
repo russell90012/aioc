@@ -63,7 +63,7 @@ aioc_error_t aioc_init(void)
   e = aioc_adc_init(AIOC_ADC_ID_5V, &aioc_adc_handle_5v);
   if (e)
   {
-    return error_adc_init;
+    return e;
   }
 
   return error_none;

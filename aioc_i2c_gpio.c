@@ -271,7 +271,7 @@ aioc_error_t aioc_i2c_gpio_pin_pulse_low( i2c_gpio_pin_name_t pin_name,
   e = aioc_util_i2c_open();
   if (e)
   {
-    return error_i2c_bus;
+    return e;
   }
   
   // Get the device address, command byte and register data.  Make a backup of the
@@ -294,7 +294,7 @@ aioc_error_t aioc_i2c_gpio_pin_pulse_low( i2c_gpio_pin_name_t pin_name,
           data);
     if (e)
     {
-      return error_i2c_bus;
+      return e;
     }
     
     aioc_util_delay_ns(pulse_duration);
@@ -306,14 +306,14 @@ aioc_error_t aioc_i2c_gpio_pin_pulse_low( i2c_gpio_pin_name_t pin_name,
           data);
     if (e)
     {
-      return error_i2c_bus;
+      return e;
     }
   }
   
   e = aioc_util_i2c_close();
   if (e)
   {
-    return error_i2c_bus;
+    return e;
   }
   
   return error_none;
@@ -335,7 +335,7 @@ aioc_error_t aioc_i2c_gpio_pin_level_set( i2c_gpio_pin_name_t pin_name,
   e = aioc_util_i2c_open();
   if (e)
   {
-    return error_i2c_bus;
+    return e;
   }
   
   {
@@ -363,14 +363,14 @@ aioc_error_t aioc_i2c_gpio_pin_level_set( i2c_gpio_pin_name_t pin_name,
           data);
     if (e)
     {
-      return error_i2c_bus;
+      return e;
     }    
   }
   
   e = aioc_util_i2c_close();
   if (e)
   {
-    return error_i2c_bus;
+    return e;
   }
   
   return error_none;
@@ -399,7 +399,7 @@ aioc_error_t aioc_i2c_gpio_write_device_maps(void)
   e = aioc_util_i2c_open();
   if (e)
   {
-    return error_i2c_bus;
+    return e;
   }
   
   for ( i = 0; i < NUM_DEVICES; i++)
@@ -412,7 +412,7 @@ aioc_error_t aioc_i2c_gpio_write_device_maps(void)
           i2c_gpio_devices[i].regs.configuration[0]);
     if (e)
     {
-      return error_i2c_bus;
+      return e;
     }
     
     e = aioc_i2c_gpio_register_write(
@@ -421,7 +421,7 @@ aioc_error_t aioc_i2c_gpio_write_device_maps(void)
           i2c_gpio_devices[i].regs.configuration[1]);
     if (e)
     {
-      return error_i2c_bus;
+      return e;
     }
     
     e = aioc_i2c_gpio_register_write(
@@ -430,7 +430,7 @@ aioc_error_t aioc_i2c_gpio_write_device_maps(void)
           i2c_gpio_devices[i].regs.polarity[0]);
     if (e)
     {
-      return error_i2c_bus;
+      return e;
     }
     
     e = aioc_i2c_gpio_register_write(
@@ -439,7 +439,7 @@ aioc_error_t aioc_i2c_gpio_write_device_maps(void)
           i2c_gpio_devices[i].regs.polarity[1]);
     if (e)
     {
-      return error_i2c_bus;
+      return e;
     }
     
     e = aioc_i2c_gpio_register_write(
@@ -448,7 +448,7 @@ aioc_error_t aioc_i2c_gpio_write_device_maps(void)
           i2c_gpio_devices[i].regs.output[0]);
     if (e)
     {
-      return error_i2c_bus;
+      return e;
     }
     
     e = aioc_i2c_gpio_register_write(
@@ -457,14 +457,14 @@ aioc_error_t aioc_i2c_gpio_write_device_maps(void)
           i2c_gpio_devices[i].regs.output[1]);
     if (e)
     {
-      return error_i2c_bus;
+      return e;
     }
   }
   
   e = aioc_util_i2c_close();
   if (e)
   {
-    return error_i2c_bus;
+    return e;
   }
   
   return error_none;
@@ -478,7 +478,13 @@ aioc_error_t aioc_i2c_gpio_register_write(
   uint32_t command_byte,
   uint8_t data)
 {
-  // TBD
+  aioc_error_t  e = 0;
+
+  e = aioc_util_i2c_write(device_address, command_byte, 1, &data);
+  if (e)
+  {
+    return e;
+  }
   
   return error_none;
 }

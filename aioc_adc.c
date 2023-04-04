@@ -166,7 +166,7 @@ aioc_adc_init(aioc_adc_id_t aioc_adc_id, aioc_adc_handle_t* aioc_adc_handle)
  
   if (aioc_adc_id >= NUMBER_OF_AIOC_ADC_IDS)
   {
-    return error_adc_init;
+    return error_bad_param;
   }
 
   aioc_adc_context_t* aioc_adc_context =  &aioc_adc_context_table[aioc_adc_id];
@@ -293,11 +293,11 @@ aioc_error_t aioc_adc_self_check(void)
   }
   if (STATUS_RESET_FLAG_read(data))
   {
-    return error_no_reset;
+    return error_adc_self_check;
   }  
   if (STATUS_SPI_ERROR_read(data))
   {
-    return error_spi_bus;
+    return error_adc_self_check;
   }
   
   // Check the Vendor ID of the ADC.
@@ -310,7 +310,7 @@ aioc_error_t aioc_adc_self_check(void)
   }
   if (data != VENDOR_L_reset)
   {
-    return error_vendor_id_low;
+    return error_adc_self_check;
   }
   data = 0;
   aioc_adc_register_read(VENDOR_H_adrs, &data, 1);
@@ -320,7 +320,7 @@ aioc_error_t aioc_adc_self_check(void)
   }
   if (data != VENDOR_H_reset)
   {
-    return error_vendor_id_high;
+    return error_adc_self_check;
   }
 
   // Check the Device Type of the ADC.
@@ -333,7 +333,7 @@ aioc_error_t aioc_adc_self_check(void)
   }
   if (data != DEVICE_TYPE_reset)
   {
-    return error_device_type;
+    return error_adc_self_check;
   }
 
    // Check scratch pad register access.
@@ -352,7 +352,7 @@ aioc_error_t aioc_adc_self_check(void)
   }
   if (data != 0xA5)
   {
-    return error_register_access;
+    return error_adc_self_check;
   }
 
   return error_none;

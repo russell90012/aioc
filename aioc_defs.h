@@ -14,10 +14,7 @@ typedef enum  // aioc_error_t
   error_spi_bus,
   error_bad_param,
   error_no_reset,
-  error_vendor_id_low,
-  error_vendor_id_high,
-  error_device_type,
-  error_register_access,
+  error_adc_self_check,
   error_adc_init,
   error_ai_mapping
 }
