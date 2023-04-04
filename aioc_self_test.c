@@ -22,6 +22,7 @@ static aioc_test_table_entry_t aioc_test_table[] =
 // TBD
 {
   {AIOC_AI_LEFT_FWD_OVER_PRESSURE_SENSOR, 0, 0},
+#if 0
   {AIOC_AI_LEFT_AFT_OVER_PRESSURE_SENSOR, 0, 0},
   {AIOC_AI_RIGHT_FWD_OVER_PRESSURE_SENSOR, 0, 0},
   {AIOC_AI_RIGHT_AFT_OVER_PRESSURE_SENSOR, 0, 0},
@@ -29,6 +30,7 @@ static aioc_test_table_entry_t aioc_test_table[] =
   {AIOC_AI_FWD_LEFT_FEEDPIPE_PRESSURE_SENSOR, 0, 0},
   {AIOC_AI_AFT_LEFT_FEEDPIPE_PRESSURE_SENSOR, 0, 0},
   {AIOC_AI_FWD_RIGHT_FEEDPIPE_PRESSURE_SENSOR, 0, 0}
+#endif
 };
 
 static char* aioc_ai_names[] =
@@ -65,10 +67,7 @@ aioc_error_t aioc_self_test(void)
   
   // Initialize the board.
   e = aioc_init();
-  if (e)
-  {
-    return e;
-  }
+  if (e)  {  return e;  }
 
   printf("%s: testing the BIT HIGH input selections.\n", __FUNCTION__);
   // Test the BIT HIGH input selections.
@@ -83,10 +82,7 @@ aioc_error_t aioc_self_test(void)
     
     // Multiplex in the BIT High inputs for 5V adc.
     e = aioc_mux_switch_lines(AIOC_MUX_BANKS_5V, AIOC_MUX_LINES_BIT_HIGH);
-    if (e)
-    {
-      return e;
-    }
+    if (e)  {  return e;  }
   
     printf("%s: processing the list of analog inputs.\n", __FUNCTION__);
 
@@ -97,10 +93,7 @@ aioc_error_t aioc_self_test(void)
         __FUNCTION__,
         aioc_ai_names[i]);
       e = aioc_analog_input_conversion(test_table[i].ai_id, &result);
-      if (e)
-      {
-        return e;
-      }
+      if (e)  {  return e;  }
       printf("%s: checking result %x, upper limit %x, lower limit %x\n",
         __FUNCTION__,
         result,

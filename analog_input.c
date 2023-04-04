@@ -1,39 +1,66 @@
-/*******************************************************************************
- *
- *  File Name   :  AnalogInput.c
- *
- *  Version     :  SVN $Revision:: 519    $
- *
- *  Description :  This module provides functions to initialize the
- *                 internal and external ADCs and retrieve data.
- *
- *  Author      :  Brefeld, Tony
- *
- *  Note        :  Curtiss-Wright Controls, Inc. - All right reserved
- *
- *  Note2       :  Used the following reference documents:
- *                 DOORS EXPORT 104-0091 SRD 08-16-10 (PER SAC REV4)
- *                 105-0019 ICD vss48
- *                 121-0648 DCU Hardware Address Mapping vss13
- *                 104-0093 OFP SDD dated: 7/8/2010
- *
- *
- *  Date      PCR#  User         Change Description
- *  --------  ----  -----------  -----------------------------------------------
- *  09/07/10  N/A   T. Brefeld   Initial
- *  8/21/12  1446   J. Squiers   Corrected spacing to match standards
- *
- ******************************************************************************/
 
-/*******************************************************************************
- *                             # I n c l u d e s                               *
- ******************************************************************************/
+// MERCURY HEADER GOES HERE
+// TBD
+
 #include "AnalogInput.h"
-
+#include "aioc.h"
 #include "aioc_defs.h"
 
-#include "aioc.h"
+//==========================
+// Private specifications.
+//==========================
 
+/**
+ * This function maps the legacy analog id to the AIOC verstion.
+ *
+ * @param analog_id is the legacy analog id that gets mapped to the
+ *        AIOC version.
+ *
+ * @return an AIOC analog id.
+ */
+static aioc_analog_id_t map_to_aioc_analog_id(GENERIC_ANALOG_IN_TYPE analogID);
+
+
+//==========================
+// Public definitions.
+//==========================
+
+//==============================================================================
+//==============================================================================
+UINT16 SampleOneAnalogInput(GENERIC_ANALOG_IN_TYPE analogID)
+{
+  // Perform AIOC adc converstion for this analog input.
+  uint16_t result = 0;
+  aioc_error_t e = error_none;
+
+  // map this analog id to aioc analog id.
+  aioc_analog_id_t analog_id = AIOC_AI_NOT_DEFINED;
+  analog_id = map_to_aioc_analog_id(analogID);
+  if (analog_id == AIOC_AI_NOT_DEFINED)
+  {
+    return 0;
+  }
+  
+  e = aioc_analog_input_conversion(analog_id, &result);
+  if (e)
+  {
+    return 0;
+  }
+
+  // Return raw data
+  return (result);
+}
+
+
+
+//==========================
+// Private definitions.
+//==========================
+
+/**
+ * Intermediate enumerations that are used for mapping from the legacy 
+ * GENERIC_ANALOG_IN_TYPE ids to the AIOC analog input enumerations.
+ */
 enum
 {
    AI_LEFT_FWD_OVERPRESSURE_SENSOR            = ANALOG_IN_68,  // Z2FV_1
@@ -103,40 +130,10 @@ enum
 };
 
 
-/*******************************************************************************
- *             I n t e r n a l   T y p e   D e c l a r a t i o n s             *
- ******************************************************************************/
-
-/* none */
-
-/*******************************************************************************
- *             I n t e r n a l   D a t a   D e c l a r a t i o n s             *
- ******************************************************************************/
-
-/* none */
-
-/*******************************************************************************
- *           I n t e r n a l   F u n c t i o n   P r o t o t y p e s           *
- ******************************************************************************/
-
-/* none */
-
-/*******************************************************************************
- *                   F u n c t i o n   D e f i n i t i o n s                   *
- ******************************************************************************/
-
-/*******************************************************************************
- *
- * Function    :  map_to_aioc_analog_id
- *
- * Description :  This function maps the legacy analog id to the aioc verstion.
- *
- * Parameter   :  UINT32 analogID
- *
- * Returns     :  UINT32 analog_id is the AIOC version.
- *
- ******************************************************************************/
-static aioc_analog_id_t map_to_aioc_analog_id(GENERIC_ANALOG_IN_TYPE analogID)
+//==============================================================================
+//==============================================================================
+static aioc_analog_id_t
+map_to_aioc_analog_id(GENERIC_ANALOG_IN_TYPE analogID)
 {
   aioc_analog_id_t result = AIOC_AI_NOT_DEFINED;
 
@@ -275,32 +272,5 @@ static aioc_analog_id_t map_to_aioc_analog_id(GENERIC_ANALOG_IN_TYPE analogID)
   }
  
   return result;
-}
-
-
-//==============================================================================
-//==============================================================================
-UINT16 SampleOneAnalogInput(GENERIC_ANALOG_IN_TYPE analogID)
-{
-  // Perform AIOC adc converstion for this analog input.
-  uint16_t result = 0;
-  aioc_error_t e = error_none;
-
-  // map this analog id to aioc analog id.
-  aioc_analog_id_t analog_id = AIOC_AI_NOT_DEFINED;
-  analog_id = map_to_aioc_analog_id(analogID);
-  if (analog_id == AIOC_AI_NOT_DEFINED)
-  {
-    return 0;
-  }
-  
-  e = aioc_analog_input_conversion(analog_id, &result);
-  if (e)
-  {
-    return 0;
-  }
-
-  // Return raw data
-  return (result);
 }
 

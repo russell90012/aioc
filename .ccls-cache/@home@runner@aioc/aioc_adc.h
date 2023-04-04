@@ -18,21 +18,6 @@ typedef enum
 }
 aioc_adc_id_t;
 
-typedef void* aioc_adc_handle_t;
-
-typedef enum
-{
-  AIOC_ADC_STATE_REGISTER_MODE = 0,
-  AIOC_ADC_STATE_CONVERSTION_MODE
-}
-aioc_adc_state_t;
-
-typedef struct
-{
-  aioc_adc_state_t state;
-}
-aioc_adc_context_t;
-
 typedef enum
 {
   // AI Analog 0-5 VDC
@@ -52,18 +37,22 @@ typedef enum
 }
 aioc_adc_input_t;
 
+typedef void* aioc_adc_handle_t;
+
+
 //==============================================================================
 //==============================================================================
 // Public functions declarations.
 //==============================================================================
 //==============================================================================
 aioc_error_t
-aioc_adc_init(aioc_adc_id_t, aioc_adc_handle_t* aioc_adc_handle);
+aioc_adc_init(aioc_adc_id_t aioc_adc_id, aioc_adc_handle_t* aioc_adc_handle);
 
 aioc_error_t
 aioc_adc_convert_single_cycle(
   aioc_adc_handle_t adc_handle, 
-  aioc_adc_input_t adc_input);
+  aioc_adc_input_t adc_input,
+  uint16_t* result);
 
 
 

@@ -1,47 +1,53 @@
-//==============================================================================
-//==============================================================================
-#include "aioc.h"
+// MERCURY HEADER GOES HERE
+// TBD
 
+#include "aioc.h"
 #include "aioc_i2c_gpio.h"
 #include "aioc_util.h"
 #include "aioc_adc.h"
+
+
 //==============================================================================
 //==============================================================================
 
 
 
-//==============================================================================
-//==============================================================================
-// Private declarations and definitions.
-//==============================================================================
-//==============================================================================
-aioc_error_t aioc_reset_all_adc(void);
+//==========================
+// Private specifications.
+//==========================
 
-aioc_error_t map_ai_to_adc_handle_and_input(
+/**
+ * Reset the five ADCs by pulsing the i2c gpio reset lines low.
+ *
+ * @return error handling result code.
+ */
+static aioc_error_t aioc_reset_all_adc(void);
+
+/**
+ * Map the aioc analog input id to an adc device handle and an adc input.
+ *
+ * @param analog_id is the analog input that gets mapped to the adc handle
+ *        and adc input.
+ *
+ * @param adc_handle is how the handle is returned to the caller.
+ *
+ * @param adc_input is how the adc input is returned to the caller.
+ *
+ * @return error handling result code.
+ */
+static aioc_error_t map_ai_to_adc_handle_and_input(
               aioc_analog_id_t analog_id,
               aioc_adc_handle_t* adc_handle,
               aioc_adc_input_t* adc_input);
 
 static aioc_adc_handle_t aioc_adc_handle_5v = 0;
+//==========================
+//==========================
 
 //==============================================================================
 //==============================================================================
-
-
-//==============================================================================
-//==============================================================================
-// Public functions.
-//==============================================================================
-//==============================================================================
-
-//==============================================================================
-/**
- * This procedure will initialize the AIOC.  This includes cconfiguration of
- * the ADC's for single-cycle mode conversion and input MUX's switched to
- * standard (non-bit) inputs.
- */
-//==============================================================================
-aioc_error_t aioc_init(void)
+aioc_error_t 
+aioc_init(void)
 {
   aioc_error_t e = error_none;
 
@@ -72,9 +78,8 @@ aioc_error_t aioc_init(void)
 
 //==============================================================================
 //==============================================================================
-aioc_error_t aioc_analog_input_conversion(
-              aioc_analog_id_t analog_id, 
-              uint16_t* result)
+aioc_error_t 
+aioc_analog_input_conversion(aioc_analog_id_t analog_id, uint16_t* result)
 {
   aioc_error_t e = error_none;
 
@@ -97,15 +102,14 @@ aioc_error_t aioc_analog_input_conversion(
 }
 
 
-//==============================================================================
-//==============================================================================
-// Private functions.
-//==============================================================================
-//==============================================================================
+//================================
+// Private function definitions.
+//================================
 
 //==============================================================================
 //==============================================================================
-aioc_error_t aioc_reset_all_adc(void)
+static aioc_error_t
+aioc_reset_all_adc(void)
 {
   aioc_error_t e = error_none;
 
@@ -155,10 +159,11 @@ aioc_error_t aioc_reset_all_adc(void)
 
 //==============================================================================
 //==============================================================================
-aioc_error_t map_ai_to_adc_handle_and_input(
-              aioc_analog_id_t analog_id,
-              aioc_adc_handle_t* adc_handle,
-              aioc_adc_input_t* adc_input)
+static aioc_error_t
+map_ai_to_adc_handle_and_input(
+    aioc_analog_id_t analog_id,
+    aioc_adc_handle_t* adc_handle,
+    aioc_adc_input_t* adc_input)
 {
   aioc_error_t e = error_none;
   aioc_adc_input_t input = 0;
@@ -216,6 +221,7 @@ aioc_error_t map_ai_to_adc_handle_and_input(
     //A5V_SPARE_1                         = A5V_11_MON
     //A5V_SPARE_2                       = A5V_12_MON;
     
+    // TBD
 #if  0
     // AI Analog 0-7 VDC
     case AIOC_AI_PROBE1_RIGHT_FWD_FUEL_QUANTITY:

@@ -1,116 +1,53 @@
-//==============================================================================
-//==============================================================================
-#include "aioc.h"
+// MERCURY HEADER GOES HERE
+// TBD
 
+#include "aioc.h"
 #include "aioc_i2c_gpio.h"
 #include "aioc_util.h"
 #include "aioc_adc.h"
+
+
 //==============================================================================
 //==============================================================================
 
 
 
-// SPI device id and cs table
-typedef struct
-{
-  uint32_t spi_dev_id;
-  uint32_t spi_cs_id;
-}
-aioc_adc_info_t;
+//==========================
+// Private specifications.
+//==========================
 
-aioc_adc_info_t aioc_adc_info_table[] =
-{
-  {0, 0}, // AIOC_ADC_ID_5V
-  {0, 1}, // AIOC_ADC_ID_7V
-  {1, 0}, // AIOC_ADC_ID_95mV
-  {1, 1}, // AIOC_ADC_ID_RTD
-  {1, 2}  // AIOC_ADC_ID_EP10
-};
+/**
+ * Reset the five ADCs by pulsing the i2c gpio reset lines low.
+ *
+ * @return error handling result code.
+ */
+static aioc_error_t aioc_reset_all_adc(void);
 
-typedef struct
-{
-  uint32_t      spi_dev_id;
-  uint32_t      spi_cs_id;
-  uint32_t      gpio_id;
-  uint32_t      adc_input;
-}
-aioc_ai_info_t;
-
-
-aioc_ai_info_t  aioc_ai_info_table[] = 
-{
-                 // AI Analog 0-5 VDC
-  {0, 0, 0, 0},  // AIOC_AI_LEFT_FWD_OVER_PRESSURE_SENSOR
-  {0, 0, 0, 1},  // AIOC_AI_LEFT_AFT_OVER_PRESSURE_SENSOR
-  {0, 0, 0, 2},  // AIOC_AI_RIGHT_FWD_OVER_PRESSURE_SENSOR
-  {0, 0, 0, 3},  // AIOC_AI_RIGHT_AFT_OVER_PRESSURE_SENSOR
-  {0, 0, 0, 4},  // AIOC_AI_AFT_RIGHT_FEEDPIPE_PRESSURE_SENSOR
-  {0, 0, 0, 5},  // AIOC_AI_FWD_LEFT_FEEDPIPE_PRESSURE_SENSOR
-  {0, 0, 0, 6},  // AIOC_AI_AFT_LEFT_FEEDPIPE_PRESSURE_SENSOR
-  {0, 0, 0, 7},  // AIOC_AI_FWD_RIGHT_FEEDPIPE_PRESSURE_SENSOR
-
-                 // AI Analog 0-7 VDC
-  {0, 1, 0, 0},  // AIOC_AI_PROBE1_LEFT_FWD_FUEL_QUANTITY
-  {0, 1, 0, 1},  // AIOC_AI_PROBE1_RIGHT_FWD_FUEL_QUANTITY
-  {0, 1, 0, 2},  // AIOC_AI_PROBE1_LEFT_AFT_FUEL_QUANTITY
-  {0, 1, 0, 3},  // AIOC_AI_PROBE1_RIGHT_AFT_FUEL_QUANTITY
-  {0, 1, 0, 4},  // AIOC_AI_PROBE2_LEFT_FWD_FUEL_QUANTITY
-  {0, 1, 0, 5},  // AIOC_AI_PROBE2_RIGHT_FWD_FUEL_QUANTIT
-  {0, 1, 0, 6},  // AIOC_AI_PROBE2_LEFT_AFT_FUEL_QUANTITY
-  {0, 1, 0, 7},  // AIOC_AI_PROBE2_RIGHT_AFT_FUEL_QUANTITY
-                 //                                                  
-                 // AI Analog 95 mVDC
-  {1, 1, 1, 0},  // AIOC_AI_IGB_OIL_FILTER_DELTA_P
-  {1, 1, 1, 1},  // AIOC_AI_IGB_MANIFOLD_OIL_PRESSURE
-  {1, 1, 1, 2},  // AIOC_AI_MGB_OIL_FILTER_DELTA_P
-  {1, 1, 1, 3},  // AIOC_AI_MGB_MANIFOLD_OIL_PRESSURE
-  {1, 1, 1, 4},  // AIOC_AI_TGB_OIL_FILTER_DELTA_P
-  {1, 1, 1, 5},  // AIOC_AI_TGB_MANIFOLD_OIL_PRESSURE
-  {1, 1, 1, 6},  // AIOC_AI_NGB1_OIL_FILTER_DELTA_P
-  {1, 1, 1, 7},  // AIOC_AI_NGB1_MANIFOLD_OIL_PRESSURE
-  {1, 1, 1, 8},  // AIOC_AI_NGB3_MANIFOLD_OIL_FILTER_DELTA_P
-  {1, 1, 1, 9},  // AIOC_AI_NGB3_MANIFOLD_OIL_PRESSURE
-
-                 // AI Analog RTD
-  {1, 2, 1, 0},  // AIOC_AI_IGB_MANIFOLD_OIL_FILTER_TEMPERATURE
-  {1, 2, 1, 1},  // AIOC_AI_MGB_OIL_FILTER_TEMPERATURE
-  {1, 2, 1, 2},  // AIOC_AI_TGB_MANIFOLD_OIL_TEMPERATURE
-  {1, 2, 1, 3},  // AIOC_AI_NGB1_OIL_FILTER_TEMPERATURE
-  {1, 2, 1, 4}   // AIOC_AI_NGB3_OIL_FILTER_TEMPERATURE
-};
-
-//==============================================================================
-//==============================================================================
-// Private declarations and definitions.
-//==============================================================================
-//==============================================================================
-aioc_error_t aioc_reset_all_adc(void);
-
-aioc_error_t map_ai_to_adc_handle_and_input(
+/**
+ * Map the aioc analog input id to an adc device handle and an adc input.
+ *
+ * @param analog_id is the analog input that gets mapped to the adc handle
+ *        and adc input.
+ *
+ * @param adc_handle is how the handle is returned to the caller.
+ *
+ * @param adc_input is how the adc input is returned to the caller.
+ *
+ * @return error handling result code.
+ */
+static aioc_error_t map_ai_to_adc_handle_and_input(
               aioc_analog_id_t analog_id,
               aioc_adc_handle_t* adc_handle,
               aioc_adc_input_t* adc_input);
 
 static aioc_adc_handle_t aioc_adc_handle_5v = 0;
+//==========================
+//==========================
 
 //==============================================================================
 //==============================================================================
-
-
-//==============================================================================
-//==============================================================================
-// Public functions.
-//==============================================================================
-//==============================================================================
-
-//==============================================================================
-/**
- * This procedure will initialize the AIOC.  This includes cconfiguration of
- * the ADC's for single-cycle mode conversion and input MUX's switched to
- * standard (non-bit) inputs.
- */
-//==============================================================================
-aioc_error_t aioc_init(void)
+aioc_error_t 
+aioc_init(void)
 {
   aioc_error_t e = error_none;
 
@@ -132,7 +69,7 @@ aioc_error_t aioc_init(void)
   e = aioc_adc_init(AIOC_ADC_ID_5V, &aioc_adc_handle_5v);
   if (e)
   {
-    return error_adc_init;
+    return e;
   }
 
   return error_none;
@@ -141,9 +78,8 @@ aioc_error_t aioc_init(void)
 
 //==============================================================================
 //==============================================================================
-aioc_error_t aioc_analog_input_conversion(
-              aioc_analog_id_t analog_id, 
-              uint16_t* result)
+aioc_error_t 
+aioc_analog_input_conversion(aioc_analog_id_t analog_id, uint16_t* result)
 {
   aioc_error_t e = error_none;
 
@@ -156,7 +92,7 @@ aioc_error_t aioc_analog_input_conversion(
     return e;
   }      
 
-  e = aioc_adc_convert_single_cycle(adc_handle, adc_input);
+  e = aioc_adc_convert_single_cycle(adc_handle, adc_input, result);
   if (e)
   {
     return e;
@@ -166,15 +102,14 @@ aioc_error_t aioc_analog_input_conversion(
 }
 
 
-//==============================================================================
-//==============================================================================
-// Private functions.
-//==============================================================================
-//==============================================================================
+//================================
+// Private function definitions.
+//================================
 
 //==============================================================================
 //==============================================================================
-aioc_error_t aioc_reset_all_adc(void)
+static aioc_error_t
+aioc_reset_all_adc(void)
 {
   aioc_error_t e = error_none;
 
@@ -224,10 +159,11 @@ aioc_error_t aioc_reset_all_adc(void)
 
 //==============================================================================
 //==============================================================================
-aioc_error_t map_ai_to_adc_handle_and_input(
-              aioc_analog_id_t analog_id,
-              aioc_adc_handle_t* adc_handle,
-              aioc_adc_input_t* adc_input)
+static aioc_error_t
+map_ai_to_adc_handle_and_input(
+    aioc_analog_id_t analog_id,
+    aioc_adc_handle_t* adc_handle,
+    aioc_adc_input_t* adc_input)
 {
   aioc_error_t e = error_none;
   aioc_adc_input_t input = 0;
@@ -285,6 +221,8 @@ aioc_error_t map_ai_to_adc_handle_and_input(
     //A5V_SPARE_1                         = A5V_11_MON
     //A5V_SPARE_2                       = A5V_12_MON;
     
+    // TBD
+#if  0
     // AI Analog 0-7 VDC
     case AIOC_AI_PROBE1_RIGHT_FWD_FUEL_QUANTITY:
     
@@ -331,12 +269,17 @@ aioc_error_t map_ai_to_adc_handle_and_input(
     case AIOC_AI_NGB1_OIL_FILTER_TEMPERATURE:
     
     case AIOC_AI_NGB3_OIL_FILTER_TEMPERATURE:
-      
+#endif
+    
     default:
       e = error_ai_mapping;
+      return e;
     }
+  
+  *adc_input = input;
+  *adc_handle = handle;
 
-  return e;
+  return error_none;
 }
   
 
