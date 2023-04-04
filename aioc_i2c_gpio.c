@@ -258,8 +258,9 @@ aioc_error_t aioc_i2c_gpio_configure(void)
 //==============================================================================
 // Pulse the specified pin low for the specified nannoseconds.
 //==============================================================================
-aioc_error_t aioc_i2c_gpio_pin_pulse_low( i2c_gpio_pin_name_t pin_name, 
-                                          uint32_t pulse_duration) 
+aioc_error_t aioc_i2c_gpio_pin_pulse_low(
+  i2c_gpio_pin_name_t pin_name, 
+  uint32_t pulse_duration) 
 {
   aioc_error_t e;
 

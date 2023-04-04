@@ -228,27 +228,17 @@ aioc_error_t aioc_adc_convert_single_cycle(
   e = aioc_util_spi_open(
         aioc_adc_context->spi_dev_id,
         aioc_adc_context->spi_cs_id);
-  if (e)
-  {
-    return e;
-  }
-
+  if (e)  {  return e;  }
+  
   // Issue specific input channel selection command.
   e = aioc_adc_conversion_mode_command_channel_selection(adc_input);
-  if (e)
-  {
-    return e;
-  }
+  if (e)  {  return e;  }
   
   // Pulse the appropriate ADC convert signal active (low) for appropriate
   // duration.
   //  CNV Low Time: tCNVL: 80 ns
-  uint32_t convert_id = aioc_adc_context->gpio_id;
-  e = aioc_util_ultrascale_gpio_pulse_low(convert_id, 80);
-  if (e)
-  {
-    return e;
-  }
+  e = aioc_util_ultrascale_gpio_pulse_low(aioc_adc_context->gpio_id, 80);
+  if (e)  {  return e;  }
 
   // Delay for conversion time.
   //  Conversion Time: tCONVERT: 380-415 ns.
@@ -256,16 +246,10 @@ aioc_error_t aioc_adc_convert_single_cycle(
   
   // Read the conversion result.
   e = aioc_adc_conversion_mode_result_read(result);
-  if (e)
-  {
-    return e;
-  }
+  if (e)  {  return e;  }
   
   e = aioc_util_spi_close();
-  if (e)
-  {
-    return e;
-  }
+  if (e)  {  return e;  }
 
   return error_none;
 }
@@ -384,24 +368,15 @@ aioc_error_t aioc_adc_configure_single_cycle_mode(void)
   // Set the STD_SEQ_EN bit to 0, set the NUM_SLOTS_AS bit field to 0x00, and
   data = 0;
   e = aioc_adc_register_write(SEQ_CTRL_adrs, &data, 1);
-  if (e)
-  {
-    return e;
-  }
-  
+  if (e)  {  return e;  }
+ 
   // Set the CYC_CTRL bit to 1.
   data = 0;
   e = aioc_adc_register_read(SETUP_adrs, &data, 1);
-  if (e)
-  {
-    return e;
-  }
-  data |=  (uint8_t)(SETUP_CYC_CTRL_mask << SETUP_CYC_CTRL_offset);
+  if (e)  {  return e;  }
+  data |=  ((uint8_t)(SETUP_CYC_CTRL_mask << SETUP_CYC_CTRL_offset));
   e = aioc_adc_register_write(SETUP_adrs, &data, 1);
-  if (e)
-  {
-    return e;
-  }
+  if (e)  {  return e;  }
   
   // When the busy indicator is enabled on a general-purpose pin, the
   // selected general-purpose pin is driven high while the ADC is in
@@ -409,7 +384,7 @@ aioc_error_t aioc_adc_configure_single_cycle_mode(void)
   // ready. Set the BUSY_GP_EN bit in the GP_MODE register to 1 to
   // enable the busy indicator on the selected general-purpose pin.
   //
-  // Tthe busy indicator
+  // The busy indicator
   // can be enabled on either the BSY_ALT_GP0 pin or the GP3 pin.
   // The BUSY_GP_SEL bit in the GP_MODE register selects which of
   // the general-purpose pins is configured as the busy indicator. Set
@@ -420,16 +395,10 @@ aioc_error_t aioc_adc_configure_single_cycle_mode(void)
   // GPIO_CTRL register.
   data = 0;
   e = aioc_adc_register_read(GPIO_CTRL_adrs, &data, 1);
-  if (e)
-  {
-    return e;
-  }
-  data |= GPIO_CTRL_GPO0_EN_mask;
+  if (e)  {  return e;  }
+  data |= ((uint8_t)(GPIO_CTRL_GPO0_EN_mask << GPIO_CTRL_GPO0_EN_offset));
   e = aioc_adc_register_write(GPIO_CTRL_adrs, &data, 1);
-  if (e)
-  {
-    return e;
-  }
+  if (e)  {  return e;  }
   
   // Select BSY_ALT_GP0 pin to configure as the busy indicator with the 
   // BUSY_GP_SEL bit in the GP_MODE register.
@@ -444,16 +413,10 @@ aioc_error_t aioc_adc_configure_single_cycle_mode(void)
   // GP_MODE reset: 0x0
   data = 0;
   e = aioc_adc_register_read(GP_MODE_adrs, &data, 1);
-  if (e)
-  {
-    return e;
-  }
+  if (e)  {  return e;  }
   data |=  (uint8_t)(GP_MODE_BUSY_GP_EN_mask  << GP_MODE_BUSY_GP_EN_offset);
   e = aioc_adc_register_write(GP_MODE_adrs, &data, 1);
-  if (e)
-  {
-    return e;
-  }
+  if (e)  {  return e;  }
   
   return error_none;
 }
@@ -468,10 +431,7 @@ aioc_error_t aioc_adc_conversion_mode_command_channel_selection(uint32_t input)
   // Issue specific input channel selection command.
   e = aioc_adc_conversion_mode_command_issue(
         CONVERSION_MODE_COMMAND_channel_selection(input));
-  if (e)
-  {
-    return e;
-  }
+  if (e)  {  return e;  }
   
   return error_none;
 }
@@ -492,7 +452,7 @@ aioc_error_t aioc_adc_conversion_mode_result_read(uint16_t* result)
   e = aioc_util_spi_read(data, 2);
   if (e)
   {
-    return error_spi_bus;
+    return e;
   }
   
   *result = (uint16_t)((data[1] << 8)| data[0]);
@@ -542,10 +502,7 @@ aioc_error_t aioc_adc_to_register_mode(void)
   // NOTE: This ASSUMES the ADC is in Conversion mode.
   e = aioc_adc_conversion_mode_command_issue(
         CONVERSION_MODE_COMMAND_register_configuration_mode);
-  if (e)
-  {
-    return e;
-  }
+  if (e)  {  return e;  }
 
   return error_none;
 }
@@ -573,11 +530,8 @@ aioc_error_t aioc_adc_conversion_mode_command_issue(uint32_t command)
   // Put the LSB five LSb's into a byte and SPI write it out.
   data = (uint8_t) (command & 0x1F);
   e = aioc_util_spi_write(&data, 1);
-  if (e)
-  {
-    return error_spi_bus;
-  }
-    
+  if (e)  {  return e;  }
+   
   return error_none;
 }
 
