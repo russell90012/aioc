@@ -8,8 +8,7 @@
  * @file:    aioc_adc.h
  * @author:  Russell Shahenian
  * @since:   4/4/23
- * @brief:   This file contains the top level public AIOC adc module
- *           specifications.
+ * @brief:   This file contains the public AIOC adc module specifications.
  */
 
 #include "aioc_defs.h"

@@ -1,12 +1,18 @@
-//==============================================================================
-//==============================================================================
-#include <string.h>
+// MERCURY HEADER GOES HERE
+// TBD
 
 #include "aioc_i2c_gpio.h"
 #include "aioc_util.h"
 
-//==============================================================================
-//==============================================================================
+#include <string.h>
+
+
+//==========================
+// Private specifications.
+//==========================
+
+// The table below is based on the confugration table in the specification
+// file (the header).
 typedef struct
 {
   uint32_t device_adrs;
@@ -133,13 +139,9 @@ i2c_gpio_pin_conf_t i2c_gpio_pin_configuration_table[] =
   {0X25, 1, 5, 1, 0, 0},   // NC_7,       
   {0X25, 1, 6, 1, 0, 0},   // NC_8,       
   {0X25, 1, 7, 1, 0, 0},   // NC_9,       
-};                     
-//==============================================================================
-//==============================================================================
-#define NUM_BANKS         2
-#define NUM_DEVICES       6
-#define DEVICE_ADRS_BASE  0x20
+};
 
+// The i2c GPIO register map (along with addresses).
 /**********
 Control Register and Command Byte
 
@@ -160,15 +162,9 @@ B2  B1  B0              BYTE    REGISTER        PROTOCOL          POWER-UP
 1   1   1               0x07    Configuration
                                 Bank 1          Read-write byte   1111 1111
 **********/
-enum
-{
-  COMMAND_BYTE_OUTPUT_0 = 2,
-  COMMAND_BYTE_OUTPUT_1,
-  COMMAND_BYTE_POLARITY_0,
-  COMMAND_BYTE_POLARITY_1,
-  COMMAND_BYTE_CONFIG_0,
-  COMMAND_BYTE_CONFIG_1
-};
+#define NUM_BANKS         2
+#define NUM_DEVICES       6
+#define DEVICE_ADRS_BASE  0x20
 
 typedef struct
 {
@@ -179,6 +175,8 @@ typedef struct
 }
 register_map_t;
 
+// Table of i2c GPIO register map structures.  One register map per device.
+
 typedef struct
 {
   register_map_t  regs;
@@ -188,14 +186,38 @@ i2c_gpio_device_t;
 
 static i2c_gpio_device_t i2c_gpio_devices[NUM_DEVICES] = {0};
 
+// Commands used to write to registers (basically addresses).
+enum
+{
+  COMMAND_BYTE_OUTPUT_0 = 2,
+  COMMAND_BYTE_OUTPUT_1,
+  COMMAND_BYTE_POLARITY_0,
+  COMMAND_BYTE_POLARITY_1,
+  COMMAND_BYTE_CONFIG_0,
+  COMMAND_BYTE_CONFIG_1
+};
 
 
-//==============================================================================
-//==============================================================================
-// Private functions declarations.
-//==============================================================================
-//==============================================================================
+/**
+ * Write out each device register map.  This includes 
+ * configuration, polarity and output registers.
+ *
+ * @return error handling result code.
+ */
 aioc_error_t aioc_i2c_gpio_write_device_maps(void);
+
+/**
+ * Write data value to a device register per the device address and
+ * register command.
+ *
+ * @param device_address is the device's i2c address.
+ *
+ * @param command_byte is basically a register address within a device.
+ *
+ * @param data is the register data to write out.
+ *
+ * @return error handling result code.
+ */
 aioc_error_t aioc_i2c_gpio_register_write(
               uint32_t device_address,
               uint32_t command_byte,
@@ -204,12 +226,13 @@ aioc_error_t aioc_i2c_gpio_register_write(
 //==============================================================================
 //==============================================================================
 
-//==============================================================================
-//==============================================================================
-// Public functions.
-//==============================================================================
-//==============================================================================
 
+///================================
+// Public function definitions.
+//================================
+
+//==============================================================================
+//==============================================================================
 aioc_error_t aioc_i2c_gpio_configure(void)
 {
   i2c_gpio_pin_conf_t* pin_conf = 0;
@@ -256,7 +279,6 @@ aioc_error_t aioc_i2c_gpio_configure(void)
 
 
 //==============================================================================
-// Pulse the specified pin low for the specified nannoseconds.
 //==============================================================================
 aioc_error_t aioc_i2c_gpio_pin_pulse_low(
   i2c_gpio_pin_name_t pin_name, 
@@ -321,7 +343,6 @@ aioc_error_t aioc_i2c_gpio_pin_pulse_low(
 }
 
 //==============================================================================
-// Set the specified pin to specified value.
 //==============================================================================
 aioc_error_t aioc_i2c_gpio_pin_level_set( i2c_gpio_pin_name_t pin_name, 
                                           uint32_t level) 
@@ -379,17 +400,11 @@ aioc_error_t aioc_i2c_gpio_pin_level_set( i2c_gpio_pin_name_t pin_name,
 
 
 
-//==============================================================================
-//==============================================================================
-// Private functions.
-//==============================================================================
-//==============================================================================
+//================================
+// Private function definitions.
+//================================
 
 //==============================================================================
-// Open spi bus.
-// Write out each device register map.  This includes configuration, 
-// polarity and output registers.
-// close spi bus.
 //==============================================================================
 aioc_error_t aioc_i2c_gpio_write_device_maps(void)
 {
@@ -470,7 +485,6 @@ aioc_error_t aioc_i2c_gpio_write_device_maps(void)
   
   return error_none;
 }
-
 
 //==============================================================================
 //==============================================================================

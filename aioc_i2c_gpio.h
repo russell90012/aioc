@@ -1,13 +1,22 @@
 #ifndef AIOC_I2C_GPIO_H
 #define AIOC_I2C_GPIO_H
 
-//==============================================================================
-//==============================================================================
+// MERCURY HEADER GOES HERE
+// TBD
+
+/**
+ * @file:    aioc_i2c_gpio.h
+ * @author:  Russell Shahenian
+ * @since:   4/4/23
+ * @brief:   This file contains the public AIOC i2c_gpio module specifications.
+ */
 
 #include "aioc_defs.h"
 
-//==============================================================================
-//==============================================================================
+
+//================================
+// Public specifications.
+//================================
 
 // The comments below represent a table of configurations per each 
 // I2C GPIO pin.
@@ -139,8 +148,6 @@ NC_9                     0X25             1          7         1       0       0
 
 
 
-//==============================================================================
-//==============================================================================
 typedef enum
 {
   // U149
@@ -264,25 +271,39 @@ typedef enum
 i2c_gpio_pin_name_t;
 
 
-//==============================================================================
-//==============================================================================
-aioc_error_t
-aioc_i2c_gpio_configure(void);
+/**
+ * Initial configuration of the AIOC GPIO expanders per the configuration table
+ * above.
+ *
+ * @return error handling result code.
+ */
+aioc_error_t aioc_i2c_gpio_configure(void);
 
-//==============================================================================
-// Pulse the specified pin low for the specified nannoseconds.
-//==============================================================================
-aioc_error_t
-aioc_i2c_gpio_pin_pulse_low(
+/**
+ * Pulse the specified pin low for the specified number of nannoseconds.
+ *
+ * @param pin_name is the specified pin.
+ *
+ * @param pulse_duration is the specified count of nanoseconds.
+ *
+ * @return error handling result code.
+ */
+aioc_error_t aioc_i2c_gpio_pin_pulse_low(
   i2c_gpio_pin_name_t pin_name, 
   uint32_t pulse_duration);
 
-aioc_error_t
-aioc_i2c_gpio_pin_level_set(i2c_gpio_pin_name_t pin_name, uint32_t level);
-
-//==============================================================================
-//==============================================================================
-
+/**
+ * Set the specified pin to the specified level.
+ *
+ * @param pin_name is the specified pin.
+ *
+ * @param level is the specified level.
+ *
+ * @return error handling result code.
+ */
+aioc_error_t aioc_i2c_gpio_pin_level_set(
+  i2c_gpio_pin_name_t pin_name, 
+  uint32_t level);
 
 
 #endif  // AIOC_I2C_GPIO_H
