@@ -204,7 +204,7 @@ enum
  *
  * @return error handling result code.
  */
-aioc_error_t aioc_i2c_gpio_write_device_maps(void);
+static aioc_error_t aioc_i2c_gpio_write_device_maps(void);
 
 /**
  * Write data value to a device register per the device address and
@@ -218,22 +218,23 @@ aioc_error_t aioc_i2c_gpio_write_device_maps(void);
  *
  * @return error handling result code.
  */
-aioc_error_t aioc_i2c_gpio_register_write(
-              uint32_t device_address,
-              uint32_t command_byte,
-              uint8_t data);
+static aioc_error_t aioc_i2c_gpio_register_write(
+  uint32_t device_address,
+  uint32_t command_byte,
+  uint8_t data);
 
 //==============================================================================
 //==============================================================================
 
 
-///================================
-// Public function definitions.
+//================================
+// Public  definitions.
 //================================
 
 //==============================================================================
 //==============================================================================
-aioc_error_t aioc_i2c_gpio_configure(void)
+aioc_error_t
+aioc_i2c_gpio_configure(void)
 {
   i2c_gpio_pin_conf_t* pin_conf = 0;
   uint32_t i = 0;
@@ -280,7 +281,8 @@ aioc_error_t aioc_i2c_gpio_configure(void)
 
 //==============================================================================
 //==============================================================================
-aioc_error_t aioc_i2c_gpio_pin_pulse_low(
+aioc_error_t
+aioc_i2c_gpio_pin_pulse_low(
   i2c_gpio_pin_name_t pin_name, 
   uint32_t pulse_duration) 
 {
@@ -344,8 +346,8 @@ aioc_error_t aioc_i2c_gpio_pin_pulse_low(
 
 //==============================================================================
 //==============================================================================
-aioc_error_t aioc_i2c_gpio_pin_level_set( i2c_gpio_pin_name_t pin_name, 
-                                          uint32_t level) 
+aioc_error_t
+aioc_i2c_gpio_pin_level_set( i2c_gpio_pin_name_t pin_name, uint32_t level) 
 {
   aioc_error_t e;
 
@@ -401,12 +403,13 @@ aioc_error_t aioc_i2c_gpio_pin_level_set( i2c_gpio_pin_name_t pin_name,
 
 
 //================================
-// Private function definitions.
+// Private definitions.
 //================================
 
 //==============================================================================
 //==============================================================================
-aioc_error_t aioc_i2c_gpio_write_device_maps(void)
+static aioc_error_t
+aioc_i2c_gpio_write_device_maps(void)
 {
   uint32_t i;
   uint32_t device_address = 0;
@@ -488,7 +491,8 @@ aioc_error_t aioc_i2c_gpio_write_device_maps(void)
 
 //==============================================================================
 //==============================================================================
-aioc_error_t aioc_i2c_gpio_register_write(
+static aioc_error_t
+aioc_i2c_gpio_register_write(
   uint32_t device_address,
   uint32_t command_byte,
   uint8_t data)

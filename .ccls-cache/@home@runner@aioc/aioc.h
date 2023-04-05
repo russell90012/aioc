@@ -13,6 +13,9 @@
 
 #include "aioc_defs.h"
 
+//================================
+// Public specifications.
+//================================
 
 /**
  * The current list of AIOC analog input ids.

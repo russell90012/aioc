@@ -3,15 +3,16 @@
 
 
 //================================
-// Public function definitions.
+// Public  definitions.
 //================================
 
 //==============================================================================
 //==============================================================================
-aioc_error_t aioc_mux_switch_lines(
-              aioc_mux_banks_t aioc_mux_banks,
-              aioc_mux_lines_t aioc_mux_lines)
-{
+aioc_error_t
+aioc_mux_switch_lines(
+    aioc_mux_banks_t aioc_mux_banks,
+    aioc_mux_lines_t aioc_mux_lines)
+  {
   aioc_error_t e = error_none;
   
   switch (aioc_mux_banks)

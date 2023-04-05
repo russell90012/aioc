@@ -14,6 +14,10 @@
 #include "aioc_defs.h"
 
 
+//================================
+// Public specifications.
+//================================
+
 typedef enum
 {
   AIOC_ADC_ID_5V,

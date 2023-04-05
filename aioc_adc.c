@@ -80,7 +80,6 @@
 #define CONVERSION_MODE_COMMAND_register_configuration_mode  (0xA)
 
 
-
 /**
  * Select the ADC input channel to perform the next conversion upon.
  *
@@ -91,7 +90,7 @@
  * @note the ADC we're using here is specifed by the SPI device.  And
  *       that device was opened using the ADC context info.
  */
-aioc_error_t aioc_adc_conversion_mode_command_channel_selection(
+static aioc_error_t aioc_adc_conversion_mode_command_channel_selection(
   uint32_t input);
 
 /**
@@ -103,7 +102,7 @@ aioc_error_t aioc_adc_conversion_mode_command_channel_selection(
  * @note the ADC we're using here is specifed by the SPI device.  And
  *       that device was opened using the ADC context info.
  */
-aioc_error_t aioc_adc_self_check(void);
+static aioc_error_t aioc_adc_self_check(void);
 
 /**
  * Program the channel sequencing to for single-cycle mode.  And allocate
@@ -114,7 +113,7 @@ aioc_error_t aioc_adc_self_check(void);
  * @note the ADC we're using here is specifed by the SPI device.  And
  *       that device was opened using the ADC context info.
  */
-aioc_error_t aioc_adc_configure_single_cycle_mode(void);
+static aioc_error_t aioc_adc_configure_single_cycle_mode(void);
 
 /**
  * Put the ADC into Conversion mode.
@@ -124,7 +123,7 @@ aioc_error_t aioc_adc_configure_single_cycle_mode(void);
  * @note the ADC we're using here is specifed by the SPI device.  And
  *       that device was opened using the ADC context info.
  */
-aioc_error_t aioc_adc_to_conversion_mode(void);
+static aioc_error_t aioc_adc_to_conversion_mode(void);
 
 /**
  * Put the ADC into Registger Configuration mode.
@@ -134,7 +133,7 @@ aioc_error_t aioc_adc_to_conversion_mode(void);
  * @note the ADC we're using here is specifed by the SPI device.  And
  *       that device was opened using the ADC context info.
  */
-aioc_error_t aioc_adc_to_register_mode(void);
+static aioc_error_t aioc_adc_to_register_mode(void);
 
 
 /**
@@ -147,7 +146,7 @@ aioc_error_t aioc_adc_to_register_mode(void);
  * @note the ADC we're using here is specifed by the SPI device.  And
  *       that device was opened using the ADC context info.
  */
-aioc_error_t aioc_adc_conversion_mode_command_issue(uint32_t command);
+static aioc_error_t aioc_adc_conversion_mode_command_issue(uint32_t command);
 
 /**
  * Read conversion result from ADC whilest in conversion mode.
@@ -159,7 +158,7 @@ aioc_error_t aioc_adc_conversion_mode_command_issue(uint32_t command);
  * @note the ADC we're using here is specifed by the SPI device.  And
  *       that device was opened using the ADC context info.
  */
-aioc_error_t aioc_adc_conversion_mode_result_read(uint16_t* result);
+static aioc_error_t aioc_adc_conversion_mode_result_read(uint16_t* result);
 
 
 /**
@@ -178,7 +177,7 @@ aioc_error_t aioc_adc_conversion_mode_result_read(uint16_t* result);
  *
  * @note the ADC must be in Register Configuration mode for this to work.
  */
-aioc_error_t aioc_adc_register_write(
+static aioc_error_t aioc_adc_register_write(
   uint32_t register_adrs,
   uint8_t* data,
   uint32_t data_count);
@@ -199,7 +198,7 @@ aioc_error_t aioc_adc_register_write(
  *
  * @note the ADC must be in Register Configuration mode for this to work.
  */
-aioc_error_t aioc_adc_register_read(
+static aioc_error_t aioc_adc_register_read(
   uint32_t register_adrs,
   uint8_t* data,
   uint32_t data_count);
@@ -239,7 +238,7 @@ aioc_adc_context_t aioc_adc_context_table[NUMBER_OF_AIOC_ADC_IDS] =
 
 
 //================================
-// Public function definitions.
+// Public  definitions.
 //================================
 
 //==============================================================================
@@ -336,12 +335,12 @@ aioc_adc_convert_single_cycle(
 
 
 //================================
-// Private function definitions.
+// Private definitions.
 //================================
 
 //==============================================================================
 //==============================================================================
-aioc_error_t
+static aioc_error_t
 aioc_adc_self_check(void)
 {
   aioc_error_t e = error_none;
@@ -406,7 +405,7 @@ aioc_adc_self_check(void)
 
 //==============================================================================
 //==============================================================================
-aioc_error_t
+static aioc_error_t
 aioc_adc_configure_single_cycle_mode(void)
 {
   aioc_error_t e = error_none;
@@ -491,7 +490,7 @@ aioc_adc_configure_single_cycle_mode(void)
 //==============================================================================
 //==============================================================================
 // Issue specific input channel selection command.
-aioc_error_t
+static aioc_error_t
 aioc_adc_conversion_mode_command_channel_selection(uint32_t input)
 {
   aioc_error_t e = error_none;
@@ -510,7 +509,7 @@ aioc_adc_conversion_mode_command_channel_selection(uint32_t input)
 //==============================================================================
 // TBD
 // Endianess????
-aioc_error_t
+static aioc_error_t
 aioc_adc_conversion_mode_result_read(uint16_t* result)
 {
   aioc_error_t e = error_none;
@@ -527,7 +526,7 @@ aioc_adc_conversion_mode_result_read(uint16_t* result)
 
 //==============================================================================
 //==============================================================================
-aioc_error_t
+static aioc_error_t
 aioc_adc_to_conversion_mode(void)
 {
   aioc_error_t e = error_none;
@@ -553,7 +552,7 @@ aioc_adc_to_conversion_mode(void)
 
 //==============================================================================
 //==============================================================================
-aioc_error_t
+static aioc_error_t
 aioc_adc_to_register_mode(void)
 {
   aioc_error_t e = error_none;
@@ -574,7 +573,7 @@ aioc_adc_to_register_mode(void)
 //==============================================================================
 // TBD
 // Endianess????
-aioc_error_t
+static aioc_error_t
 aioc_adc_conversion_mode_command_issue(uint32_t command)
 {
   aioc_error_t e = error_none;
@@ -606,7 +605,7 @@ static uint8_t register_data[ADC_INSTRUCTION_SIZE + ADC_REGISTER_SIZE_MAX];
 //==============================================================================
 // TBD
 // Endianess????
-aioc_error_t
+static aioc_error_t
 aioc_adc_register_read(
   uint32_t register_adrs,
   uint8_t* data,
@@ -649,7 +648,7 @@ aioc_adc_register_read(
 //==============================================================================
 // TBD
 // Endianess????
-aioc_error_t
+static aioc_error_t
 aioc_adc_register_write(
   uint32_t register_adrs,
   uint8_t* data,
