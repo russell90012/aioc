@@ -39,7 +39,6 @@ typedef struct
 aioc_test_table_entry_t;
 
 static aioc_test_table_entry_t aioc_test_table[] =
-// TBD
 {
   {AIOC_AI_LEFT_FWD_OVER_PRESSURE_SENSOR,
     0, 0,  A5V_H_BIT_upper_limit, A5V_H_BIT_lower_limit,  0, 0,

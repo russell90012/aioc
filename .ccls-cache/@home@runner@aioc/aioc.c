@@ -221,7 +221,6 @@ map_ai_to_adc_handle_and_input(
     //A5V_SPARE_1                         = A5V_11_MON
     //A5V_SPARE_2                       = A5V_12_MON;
     
-    // TBD
 #if  0
     // AI Analog 0-7 VDC
     case AIOC_AI_PROBE1_RIGHT_FWD_FUEL_QUANTITY:

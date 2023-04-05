@@ -1,11 +1,11 @@
-//==============================================================================
-//==============================================================================
+// MERCURY HEADER GOES HERE
+// TBD
 
 
 #include "aioc_adc.h"
-
 #include "aioc_util.h"
 
+#include <string.h>
 
 //==========================
 // Private specifications.
@@ -81,19 +81,6 @@
 
 
 /**
- * Select the ADC input channel to perform the next conversion upon.
- *
- * @param input is input channel.
- *
- * @return error handling result code.
- *
- * @note the ADC we're using here is specifed by the SPI device.  And
- *       that device was opened using the ADC context info.
- */
-static aioc_error_t aioc_adc_conversion_mode_command_channel_selection(
-  uint32_t input);
-
-/**
  * Check vendor and device id register values for expected values.  Check that
  * the scratch pad register works as expected.
  *
@@ -116,50 +103,25 @@ static aioc_error_t aioc_adc_self_check(void);
 static aioc_error_t aioc_adc_configure_single_cycle_mode(void);
 
 /**
- * Put the ADC into Conversion mode.
+ * Read data from the specified ADC register address.
+ *
+ * @param register_adrs is the specified ADC register address.
+ *
+ * @param data is the data being read.
+ *
+ * @param data_count is the number of bytes being read.
  *
  * @return error handling result code.
  *
  * @note the ADC we're using here is specifed by the SPI device.  And
  *       that device was opened using the ADC context info.
+ *
+ * @note the ADC must be in Register Configuration mode for this to work.
  */
-static aioc_error_t aioc_adc_to_conversion_mode(void);
-
-/**
- * Put the ADC into Registger Configuration mode.
- *
- * @return error handling result code.
- *
- * @note the ADC we're using here is specifed by the SPI device.  And
- *       that device was opened using the ADC context info.
- */
-static aioc_error_t aioc_adc_to_register_mode(void);
-
-
-/**
- * Write conversion mode commands to ADC.
- *
- * @param command is the the command that's written.
- *
- * @return error handling result code.
- *
- * @note the ADC we're using here is specifed by the SPI device.  And
- *       that device was opened using the ADC context info.
- */
-static aioc_error_t aioc_adc_conversion_mode_command_issue(uint32_t command);
-
-/**
- * Read conversion result from ADC whilest in conversion mode.
- *
- * @param result is how to conversion result is returned to calle.
- *
- * @return error handling result code.
- *
- * @note the ADC we're using here is specifed by the SPI device.  And
- *       that device was opened using the ADC context info.
- */
-static aioc_error_t aioc_adc_conversion_mode_result_read(uint16_t* result);
-
+static aioc_error_t aioc_adc_register_read(
+  uint32_t register_adrs,
+  uint8_t* data,
+  uint32_t data_count);
 
 /**
  * Write the data to the ADC register address specified.
@@ -183,25 +145,64 @@ static aioc_error_t aioc_adc_register_write(
   uint32_t data_count);
 
 /**
- * Read data from the specified ADC register address.
- *
- * @param register_adrs is the specified ADC register address.
- *
- * @param data is the data being read.
- *
- * @param data_count is the number of bytes being read.
+ * Put the ADC into Conversion mode.
  *
  * @return error handling result code.
  *
  * @note the ADC we're using here is specifed by the SPI device.  And
  *       that device was opened using the ADC context info.
- *
- * @note the ADC must be in Register Configuration mode for this to work.
  */
-static aioc_error_t aioc_adc_register_read(
-  uint32_t register_adrs,
-  uint8_t* data,
-  uint32_t data_count);
+static aioc_error_t aioc_adc_to_conversion_mode(void);
+
+
+/**
+ * Select the ADC input channel to perform the next conversion upon.
+ *
+ * @param input is input channel.
+ *
+ * @return error handling result code.
+ *
+ * @note the ADC we're using here is specifed by the SPI device.  And
+ *       that device was opened using the ADC context info.
+ */
+static aioc_error_t 
+aioc_adc_conversion_mode_command_channel_selection(uint32_t input);
+
+/**
+ * Put the ADC into Registger Configuration mode.
+ *
+ * @return error handling result code.
+ *
+ * @note the ADC we're using here is specifed by the SPI device.  And
+ *       that device was opened using the ADC context info.
+ */
+static aioc_error_t
+aioc_adc_conversion_mode_command_register_configuration(void);
+
+/**
+ * Write conversion mode commands to ADC.
+ *
+ * @param command is the the command that's written.
+ *
+ * @return error handling result code.
+ *
+ * @note the ADC we're using here is specifed by the SPI device.  And
+ *       that device was opened using the ADC context info.
+ */
+static aioc_error_t
+aioc_adc_conversion_mode_command_issue(uint32_t command);
+
+/**
+ * Read conversion result from ADC whilest in conversion mode.
+ *
+ * @param result is how to conversion result is returned to calle.
+ *
+ * @return error handling result code.
+ *
+ * @note the ADC we're using here is specifed by the SPI device.  And
+ *       that device was opened using the ADC context info.
+ */
+static aioc_error_t aioc_adc_conversion_mode_result_read(uint16_t* result);
 
 
 // Enumeration of the ADC modes (and reset is not really one of them).
@@ -232,9 +233,6 @@ aioc_adc_context_t aioc_adc_context_table[NUMBER_OF_AIOC_ADC_IDS] =
   {AIOC_ADC_STATE_RESET, 1, 1, 1}, // AIOC_ADC_ID_RTD
   {AIOC_ADC_STATE_RESET, 1, 2, 1}  // AIOC_ADC_ID_EP10
 };
-
-//==========================
-//==========================
 
 
 //================================
@@ -339,6 +337,12 @@ aioc_adc_convert_single_cycle(
 //================================
 
 //==============================================================================
+//
+// Register Configuration Mode routines.
+//
+//==============================================================================
+
+//==============================================================================
 //==============================================================================
 static aioc_error_t
 aioc_adc_self_check(void)
@@ -370,7 +374,7 @@ aioc_adc_self_check(void)
     return error_adc_self_check;
   }
   data = 0;
-  aioc_adc_register_read(VENDOR_H_adrs, &data, 1);
+  e = aioc_adc_register_read(VENDOR_H_adrs, &data, 1);
   if (e)  {  return e;  }
   if (data != VENDOR_H_reset)
   {
@@ -489,43 +493,6 @@ aioc_adc_configure_single_cycle_mode(void)
 
 //==============================================================================
 //==============================================================================
-// Issue specific input channel selection command.
-static aioc_error_t
-aioc_adc_conversion_mode_command_channel_selection(uint32_t input)
-{
-  aioc_error_t e = error_none;
-  
-  // Issue specific input channel selection command.
-  e = aioc_adc_conversion_mode_command_issue(
-        CONVERSION_MODE_COMMAND_channel_selection(input));
-  if (e)  {  return e;  }
-  
-  return error_none;
-}
-
-//==============================================================================
-// Read 16 bit result from ADC.
-// NOTE: Must be in conversion mode for this to work.
-//==============================================================================
-// TBD
-// Endianess????
-static aioc_error_t
-aioc_adc_conversion_mode_result_read(uint16_t* result)
-{
-  aioc_error_t e = error_none;
-  uint8_t data[2] = {0, 0};
-  
-  // Read 16 bits.
-  e = aioc_util_spi_read(data, 2);
-  if (e)  {  return e;  }
-  
-  *result = (uint16_t)((data[1] << 8)| data[0]);
-  
-  return error_none;  
-}
-
-//==============================================================================
-//==============================================================================
 static aioc_error_t
 aioc_adc_to_conversion_mode(void)
 {
@@ -552,8 +519,141 @@ aioc_adc_to_conversion_mode(void)
 
 //==============================================================================
 //==============================================================================
+
+static uint8_t register_buffer[ADC_INSTRUCTION_SIZE + ADC_REGISTER_SIZE_MAX];
+
+// Endianess????
+//-----------------------------------
+// ADC Register read/write routines:
+//-----------------------------------
+//
+// Register Configuration is as such:
+//
+// We're using (default):
+//  Descending Address Direction,
+//  MultiByte Register Access, and
+//  Streaming Instruction Mode (only one instruction phase is required per
+//  SPI frame and the register address being read from or written to is
+//  automatically updated after each data phase (based on the selected address
+//  direction option)).
+// Assumptions:
+//   SOM is little endian.
+// SPI transactions are in 'network (big endian) order': see ADC datasheet
+//   Figure 93. Register Configuration Mode Timing Diagrams.
+// The ADC registers are little endian; see ADC datasheet, Multibyte Register Access: 
+//   The address of each multibyte register is defined as the address of its
+//   least significant byte (LSByte), but the multibyte register contents
+//   extend across multiple register addresses. For example, the STD_SEQ_CONFIG
+//   register (Address 0x0024) is two bytes long, the address of its LSByte
+//   is 0x0024, and the address of its MSByte is 0x0025.
+// So for multi-byte register transfers to work:
+//   Calculate register address to point at highest byte address of the
+//   (possibly multi-byte) register.  Buffer up SOM (little endian) version
+//   of register address into big endian (network) order.
+//   
+// The data written or read is in big endian (network) order.  So the caller
+//   must deal with the endianness.  For example, one byte registgers have
+//   no formatting issue.
+//-----------------------------------
+    
 static aioc_error_t
-aioc_adc_to_register_mode(void)
+aioc_adc_register_read(
+  uint32_t register_adrs,
+  uint8_t* data,
+  uint32_t data_count)
+{
+  aioc_error_t e = error_none;
+  const uint16_t read_flag = 0x8000;
+  uint16_t instruction = read_flag + ((uint16_t)register_adrs);
+
+  // Check that there is data to read and that the data will fit.
+  if ((data_count == 0) ||
+      ((sizeof(register_buffer) - ADC_INSTRUCTION_SIZE) <  data_count))
+  {
+    return error_bad_param;
+  }
+
+  // Clear register buffer.
+  memset(register_buffer, 0, sizeof(register_buffer));
+  
+  // Calculate register address to point at highest byte address of the
+  // (possibly multi-byte) register.
+  instruction += (uint16_t)(data_count - 1);
+  
+  register_buffer[0] = (uint8_t)((instruction >> 8) & 0xFF);  // MSB
+  register_buffer[1] = (uint8_t)((instruction) & 0xFF);  // LSB
+  
+  e = aioc_util_spi_read(register_buffer, (data_count + ADC_INSTRUCTION_SIZE));
+  if (e)  {  return e;  }
+  
+  memcpy(data, (uint8_t*)(register_buffer+ADC_INSTRUCTION_SIZE), data_count);
+  
+  return error_none;
+}
+
+//==============================================================================
+//==============================================================================
+static aioc_error_t
+aioc_adc_register_write(
+  uint32_t register_adrs,
+  uint8_t* data,
+  uint32_t data_count)
+{
+  aioc_error_t e = error_none;
+  const uint16_t read_flag = 0x8000;
+  uint16_t instruction = read_flag + ((uint16_t)register_adrs);
+
+  // Check that there is data to read and that the data will fit.
+  if ((data_count == 0) ||
+      ((sizeof(register_buffer) - ADC_INSTRUCTION_SIZE) <  data_count))
+  {
+    return error_bad_param;
+  }
+
+  // Clear register buffer.
+  memset(register_buffer, 0, sizeof(register_buffer));
+  
+  // Calculate register address to point at highest byte address of the
+  // (possibly multi-byte) register.
+  instruction += (uint16_t)(data_count - 1);
+  
+  register_buffer[0] = (uint8_t)((instruction >> 8) & 0xFF);  // MSB
+  register_buffer[1] = (uint8_t)((instruction) & 0xFF);  // LSB
+  
+  memcpy((uint8_t*)(register_buffer+ADC_INSTRUCTION_SIZE), data, data_count);
+  
+  e = aioc_util_spi_read(register_buffer, (data_count + ADC_INSTRUCTION_SIZE));
+  if (e)  {  return e;  }
+  
+  return error_none;
+}
+
+//==============================================================================
+//
+// Conversion Mode routines.
+//
+//==============================================================================
+
+//==============================================================================
+//==============================================================================
+// Issue specific input channel selection command.
+static aioc_error_t
+aioc_adc_conversion_mode_command_channel_selection(uint32_t input)
+{
+  aioc_error_t e = error_none;
+  
+  // Issue specific input channel selection command.
+  e = aioc_adc_conversion_mode_command_issue(
+        CONVERSION_MODE_COMMAND_channel_selection(input));
+  if (e)  {  return e;  }
+  
+  return error_none;
+}
+
+//==============================================================================
+//==============================================================================
+static aioc_error_t
+aioc_adc_conversion_mode_command_register_configuration(void)
 {
   aioc_error_t e = error_none;
   uint8_t data = 0;
@@ -569,119 +669,52 @@ aioc_adc_to_register_mode(void)
 
 //==============================================================================
 // Write 5 bit conversion mode command to ADC.
+// We're writing out 16 bits.  The command is left adjusted into MSB.
 // NOTE: Must be in conversion mode for this to work.
+// The way this works:
+//  SOM is little endian (assumption).
+//  SPI frame transactions are bit endian.
+//  So put that MSB into lowest address.
 //==============================================================================
-// TBD
 // Endianess????
 static aioc_error_t
 aioc_adc_conversion_mode_command_issue(uint32_t command)
 {
   aioc_error_t e = error_none;
-  uint8_t data = 0;
- 
-  // Put the LSB five LSb's into a byte and SPI write it out.
-  data = (uint8_t) (command & 0x1F);
-  e = aioc_util_spi_write(&data, 1);
+  uint8_t data[2] = {0, 0};
+
+  // Left adjust command
+  data[0] = (uint8_t)(command & 0x1F);
+  data[0] = data[0] << 3;
+  data[1] = 0;
+  
+  e = aioc_util_spi_write(data, 2);
   if (e)  {  return e;  }
    
   return error_none;
 }
 
 //==============================================================================
+// Read 16 bit result from ADC.
+// NOTE: Must be in conversion mode for this to work.
 //==============================================================================
-static uint8_t register_data[ADC_INSTRUCTION_SIZE + ADC_REGISTER_SIZE_MAX];
-
-
-// While in Register Configuration Mode, We're using (default):
-//  Descending Address Direction,
-//  MultiByte Register Access, and
-//  Streaming Instruction Mode.
-// So, from what I understand, we will pack the lowest buffer bytes with the
-// higher significant instruction and data bytes.
-// And we need to update the address with an increase for multi-byte register
-// accesses and a flag for read instruction.
-    
-//==============================================================================
-//==============================================================================
-// TBD
 // Endianess????
 static aioc_error_t
-aioc_adc_register_read(
-  uint32_t register_adrs,
-  uint8_t* data,
-  uint32_t data_count)
+aioc_adc_conversion_mode_result_read(uint16_t* result)
 {
   aioc_error_t e = error_none;
-  uint32_t i = 0;
-
-  // Check data count to buffer size minus instruction size (of 2).
-  if ((sizeof(register_data) - ADC_INSTRUCTION_SIZE) <  data_count)
-  {
-    return error_bad_param;
-  }
-
-  // Update address including data count and read flag, 
-  // and Pack register address.
-  if (data_count > 1)
-  {
-    register_adrs += (data_count - 1);
-  }
-  register_adrs |= 0x8000;
+  uint8_t data[2] = {0, 0};
   
-  register_data[0] = (uint8_t)((register_adrs >> 8) & 0xFF);
-  register_data[1] = (uint8_t)((register_adrs) & 0xFF);
-  
-  // Do SPI transaction.
-  e = aioc_util_spi_read(register_data, (data_count + ADC_INSTRUCTION_SIZE));
+  // Read 16 bits.
+  e = aioc_util_spi_read(data, 2);
   if (e)  {  return e;  }
-  
-  // UnPack data.
-  for (i = 0; i < data_count; ++i)
-  {
-    data[i] = register_data[i+2];
-  } 
-  
-  return error_none;
-}
 
-//==============================================================================
-//==============================================================================
-// TBD
-// Endianess????
-static aioc_error_t
-aioc_adc_register_write(
-  uint32_t register_adrs,
-  uint8_t* data,
-  uint32_t data_count)
-{
-  aioc_error_t e = error_none;
-  uint32_t i = 0;
-
-  // Check data count to buffer size minus instruction size (of 2).
-  if ((sizeof(register_data) - ADC_INSTRUCTION_SIZE) <  data_count)
-  {
-    return error_bad_param;
-  }
-
-  // Update address with data count and Pack register address.
-  if (data_count > 1)
-  {
-    register_adrs += (data_count - 1);
-  }
+  // Transaction put data in big endian, this is little endian machine.
+  // So act accordingly.
+  *result = (uint16_t)(
+              ((((uint16_t)(data[0])) << 8) & 0xFF00) |
+                ((uint16_t)(data[1])        & 0x00FF) );
   
-  register_data[0] = (uint8_t)((register_adrs >> 8) & 0xFF);
-  register_data[1] = (uint8_t)((register_adrs) & 0xFF);
-    
-  // Pack data.
-  for (i = 0; i < data_count; ++i)
-  {
-    register_data[i+2] = data[i];
-  } 
-
-  // Do SPI transaction.
-  e = aioc_util_spi_write(register_data, (data_count + ADC_INSTRUCTION_SIZE));
-  if (e)  {  return e;  }
-  
-  return error_none;
+  return error_none;  
 }
 
