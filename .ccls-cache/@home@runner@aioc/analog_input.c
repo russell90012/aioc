@@ -18,7 +18,7 @@
  *
  * @return an AIOC analog id.
  */
-static aioc_analog_id_t map_to_aioc_analog_id(GENERIC_ANALOG_IN_TYPE analogID);
+static aioc_analog_id_t map_legacy_ai_to_aioc_ai(GENERIC_ANALOG_IN_TYPE analogID);
 
 
 //==========================
@@ -35,7 +35,7 @@ UINT16 SampleOneAnalogInput(GENERIC_ANALOG_IN_TYPE analogID)
 
   // map this analog id to aioc analog id.
   aioc_analog_id_t analog_id = AIOC_AI_NOT_DEFINED;
-  analog_id = map_to_aioc_analog_id(analogID);
+  analog_id = map_legacy_ai_to_aioc_ai(analogID);
   if (analog_id == AIOC_AI_NOT_DEFINED)
   {
     return 0;
@@ -133,7 +133,7 @@ enum
 //==============================================================================
 //==============================================================================
 static aioc_analog_id_t
-map_to_aioc_analog_id(GENERIC_ANALOG_IN_TYPE analogID)
+map_legacy_ai_to_aioc_ai(GENERIC_ANALOG_IN_TYPE analogID)
 {
   aioc_analog_id_t result = AIOC_AI_NOT_DEFINED;
 

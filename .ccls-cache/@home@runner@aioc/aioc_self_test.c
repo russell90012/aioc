@@ -40,7 +40,8 @@ aioc_test_table_entry_t;
 
 static aioc_test_table_entry_t aioc_test_table[] =
 {
-  {AIOC_AI_LEFT_FWD_OVER_PRESSURE_SENSOR,
+// NOTE: Initial test is one 5V ADC input with BIT HIGH input from AMP.
+ {AIOC_AI_LEFT_FWD_OVER_PRESSURE_SENSOR,
     0, 0,  A5V_H_BIT_upper_limit, A5V_H_BIT_lower_limit,  0, 0,
     "AIOC_AI_LEFT_FWD_OVER_PRESSURE_SENSOR"},
 #if 0
@@ -74,6 +75,7 @@ static aioc_test_table_entry_t aioc_test_table[] =
 //==========================
 
 //==============================================================================
+// NOTE: Initial test is one 5V ADC input with BIT HIGH input from AMP.
 //==============================================================================
 aioc_error_t aioc_self_test(void)
 {
