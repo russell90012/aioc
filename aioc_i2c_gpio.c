@@ -184,7 +184,7 @@ typedef struct
   }
 i2c_gpio_device_t;
 
-static i2c_gpio_device_t i2c_gpio_devices[NUM_DEVICES] = {0};
+i2c_gpio_device_t i2c_gpio_devices[NUM_DEVICES] = {0};
 
 // Commands used to write to registers (basically addresses).
 enum
@@ -269,10 +269,7 @@ aioc_i2c_gpio_configure(void)
   }
   
   e = aioc_i2c_gpio_write_device_maps();
-  if (e)
-  {
-    return e;
-  }
+  if (e)  {  return e;  }
   
   return error_none;
 }
@@ -294,10 +291,7 @@ aioc_i2c_gpio_pin_pulse_low(
   }
   
   e = aioc_util_i2c_open();
-  if (e)
-  {
-    return e;
-  }
+  if (e)  {  return e;  }
   
   // Get the device address, command byte and register data.  Make a backup of the
   // data.  Then set the pin bit low in the data.  Then write out the data.
@@ -317,10 +311,7 @@ aioc_i2c_gpio_pin_pulse_low(
           device_adrs,
           command_byte,
           data);
-    if (e)
-    {
-      return e;
-    }
+    if (e)  {  return e;  }
     
     aioc_util_delay_ns(pulse_duration);
     
@@ -329,17 +320,11 @@ aioc_i2c_gpio_pin_pulse_low(
           device_adrs,
           command_byte,
           data);
-    if (e)
-    {
-      return e;
-    }
+    if (e)  {  return e;  }
   }
   
   e = aioc_util_i2c_close();
-  if (e)
-  {
-    return e;
-  }
+  if (e)  {  return e;  }
   
   return error_none;
 }
@@ -357,10 +342,7 @@ aioc_i2c_gpio_pin_level_set( i2c_gpio_pin_name_t pin_name, uint32_t level)
   }
   
   e = aioc_util_i2c_open();
-  if (e)
-  {
-    return e;
-  }
+  if (e)  {  return e;  }
   
   {
     i2c_gpio_pin_conf_t*  pin_conf = &i2c_gpio_pin_configuration_table[pin_name];
@@ -385,17 +367,11 @@ aioc_i2c_gpio_pin_level_set( i2c_gpio_pin_name_t pin_name, uint32_t level)
           device_adrs,
           command_byte,
           data);
-    if (e)
-    {
-      return e;
-    }    
+    if (e)  {  return e;  }   
   }
   
   e = aioc_util_i2c_close();
-  if (e)
-  {
-    return e;
-  }
+  if (e)  {  return e;  }
   
   return error_none;
 }
@@ -416,10 +392,7 @@ aioc_i2c_gpio_write_device_maps(void)
   aioc_error_t e = error_none;
   
   e = aioc_util_i2c_open();
-  if (e)
-  {
-    return e;
-  }
+  if (e)  {  return e;  }
   
   for ( i = 0; i < NUM_DEVICES; i++)
   {
@@ -429,62 +402,41 @@ aioc_i2c_gpio_write_device_maps(void)
           device_address,
           COMMAND_BYTE_CONFIG_0,
           i2c_gpio_devices[i].regs.configuration[0]);
-    if (e)
-    {
-      return e;
-    }
+    if (e)  {  return e;  }
     
     e = aioc_i2c_gpio_register_write(
           device_address,
           COMMAND_BYTE_CONFIG_1,
           i2c_gpio_devices[i].regs.configuration[1]);
-    if (e)
-    {
-      return e;
-    }
+    if (e)  {  return e;  }
     
     e = aioc_i2c_gpio_register_write(
           device_address,
           COMMAND_BYTE_POLARITY_0,
           i2c_gpio_devices[i].regs.polarity[0]);
-    if (e)
-    {
-      return e;
-    }
+    if (e)  {  return e;  }
     
     e = aioc_i2c_gpio_register_write(
           device_address,
           COMMAND_BYTE_POLARITY_1,
           i2c_gpio_devices[i].regs.polarity[1]);
-    if (e)
-    {
-      return e;
-    }
+    if (e)  {  return e;  }
     
     e = aioc_i2c_gpio_register_write(
           device_address,
           COMMAND_BYTE_OUTPUT_0,
           i2c_gpio_devices[i].regs.output[0]);
-    if (e)
-    {
-      return e;
-    }
+    if (e)  {  return e;  }
     
     e = aioc_i2c_gpio_register_write(
           device_address,
           COMMAND_BYTE_OUTPUT_1,
           i2c_gpio_devices[i].regs.output[1]);
-    if (e)
-    {
-      return e;
-    }
+    if (e)  {  return e;  }
   }
   
   e = aioc_util_i2c_close();
-  if (e)
-  {
-    return e;
-  }
+  if (e)  {  return e;  }
   
   return error_none;
 }
@@ -499,11 +451,8 @@ aioc_i2c_gpio_register_write(
 {
   aioc_error_t  e = 0;
 
-  e = aioc_util_i2c_write(device_address, command_byte, 1, &data);
-  if (e)
-  {
-    return e;
-  }
+  e = aioc_util_i2c_write(device_address, command_byte, &data, 1);
+  if (e)  {  return e;  }
   
   return error_none;
 }

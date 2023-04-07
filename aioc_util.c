@@ -2,11 +2,17 @@
 //==============================================================================
 #include "aioc_util.h"
 
+#include "aioc_hw_sim.h"
+
 
 //==============================================================================
 //==============================================================================
 aioc_error_t aioc_util_delay_ns(uint32_t delay)
 {
+#ifdef AIOC_HW_SIM
+  aioc_hw_sim_delay_ns(delay);
+#endif
+
   // TBD
 
   return error_none;
@@ -105,8 +111,6 @@ aioc_error_t aioc_util_i2c_open(void)
   {
     aioc_util_spi_close();
   }
-
-  // TBD
   
   return error_none;
 }
@@ -127,10 +131,12 @@ aioc_error_t aioc_util_i2c_close(void)
 aioc_error_t aioc_util_i2c_write(
   uint32_t dev_adrs,
   uint32_t reg_adrs,
-  uint32_t num_bytes,
-  uint8_t* data)
+  uint8_t* data,
+  uint32_t num_bytes)
 {
-  // TBD
+#ifdef AIOC_HW_SIM
+  aioc_hw_sim_i2c_write(dev_adrs, reg_adrs, data, num_bytes);
+#endif
   
   return error_none;
 }

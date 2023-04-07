@@ -53,24 +53,15 @@ aioc_init(void)
 
   // Configure the AIOC i2c GPIO.
   e = aioc_i2c_gpio_configure();
-  if (e)
-  {
-    return e;
-  }
+  if (e)  {  return e;  }
 
   // Reset the ADCs
   e = aioc_reset_all_adc();
-  if (e)
-  {
-    return e;
-  }
+  if (e)  {  return e;  }
 
   // Initialize an ADC.
   e = aioc_adc_init(AIOC_ADC_ID_5V, &aioc_adc_handle_5v);
-  if (e)
-  {
-    return e;
-  }
+  if (e)  {  return e;  }
 
   return error_none;
 }
@@ -87,16 +78,10 @@ aioc_analog_input_conversion(aioc_analog_id_t analog_id, uint16_t* result)
   aioc_adc_input_t adc_input = 0;
   
   e = map_ai_to_adc_handle_and_input(analog_id, &adc_handle, &adc_input);
-  if (e)
-  {
-    return e;
-  }      
+  if (e)  {  return e;  }      
 
   e = aioc_adc_convert_single_cycle(adc_handle, adc_input, result);
-  if (e)
-  {
-    return e;
-  }      
+  if (e)  {  return e;  }     
 
   return error_none;
 }
@@ -122,34 +107,19 @@ aioc_reset_all_adc(void)
   // Software Reset Delay:  tSWR_DELAY: 310 µs
   
   e = aioc_i2c_gpio_pin_pulse_low(A5V_3V3_ADC_RESET_N, 10);
-  if (e)
-  {
-    return e;
-  }
+  if (e)  {  return e;  }
   
   e = aioc_i2c_gpio_pin_pulse_low(A7V_3V3_ADC_RESET_N, 10);
-  if (e)
-  {
-    return e;
-  }
+  if (e)  {  return e;  }
   
   e = aioc_i2c_gpio_pin_pulse_low(A95mV_3V3_ADC_RESET_N, 10);
-  if (e)
-  {
-    return e;
-  }
+  if (e)  {  return e;  }
   
   e = aioc_i2c_gpio_pin_pulse_low(ARTD_3V3_ADC_RESET_N, 10);
-  if (e)
-  {
-    return e;
-  }
+  if (e)  {  return e;  }
   
   e = aioc_i2c_gpio_pin_pulse_low(EP10V_3V3_ADC_RESET_N, 10);
-  if (e)
-  {
-    return e;
-  }
+  if (e)  {  return e;  }
  
   // Insert delay before any spi frames.
   aioc_util_delay_ns(310000);
