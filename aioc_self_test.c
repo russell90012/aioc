@@ -87,6 +87,7 @@ aioc_error_t aioc_self_test(void)
   // Initialize the board.
   e = aioc_init();
   if (e)  {  return e;  }
+  printf("%s: ...done.\n", __FUNCTION__);
 
   printf("%s: testing the BIT HIGH input selections.\n", __FUNCTION__);
   // Test the BIT HIGH input selections.
@@ -98,22 +99,22 @@ aioc_error_t aioc_self_test(void)
 
     uint32_t i = 0;
     
-    printf("%s: switching in the BIT HIGH inputs.\n", __FUNCTION__);
-    
+    printf("%s: switching in the BIT HIGH inputs.\n", __FUNCTION__);   
     // Multiplex in the BIT High inputs for 5V adc.
     e = aioc_mux_switch_lines(AIOC_MUX_BANKS_5V, AIOC_MUX_LINES_BIT_HIGH);
     if (e)  {  return e;  }
+    printf("%s: ...done.\n", __FUNCTION__);
   
     printf("%s: processing the list of analog inputs.\n", __FUNCTION__);
-
     // Process list of analog inputs and verify the results for each input.
     for (i = 0; i < test_table_length; i++)
     {  
-      printf("%s: processing analog input: %s\n",
+      printf("%s: converting analog input: %s\n",
         __FUNCTION__,
         test_table[i].name);
       e = aioc_analog_input_conversion(test_table[i].ai_id, &result);
       if (e)  {  return e;  }
+      printf("%s: ...done.\n", __FUNCTION__);
       
       printf("%s: checking result %x, upper limit %x, lower limit %x\n",
         __FUNCTION__,
@@ -124,16 +125,18 @@ aioc_error_t aioc_self_test(void)
       if (result < test_table[i].bit_h_lower_limit ||
           result > test_table[i].bit_h_upper_limit)
       {
-        printf("%s: result out of range, exiting.\n", __FUNCTION__);
+        printf("%s: ...result out of range, exiting.\n", __FUNCTION__);
       }
       else
       {
-        printf("%s: result in range, continuing\n", __FUNCTION__);      
+        printf("%s: ...result in range, continuing\n", __FUNCTION__);      
       }
     }
 
-    printf("%s: done.\n", __FUNCTION__);
+    printf("%s: ...done.\n", __FUNCTION__);
   }  
-  return error_none;
+  printf("%s: ...done.\n", __FUNCTION__);
+
+    return error_none;
 }
 

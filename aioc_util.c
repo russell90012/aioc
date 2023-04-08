@@ -75,6 +75,10 @@ aioc_error_t aioc_util_spi_close(void)
 //==============================================================================
 aioc_error_t aioc_util_spi_write(uint8_t* data, uint32_t number_of_bytes)
 {
+#ifdef AIOC_HW_SIM
+  aioc_hw_sim_spi_write(data, number_of_bytes);
+#endif
+
   // TBD
   
   return error_none;
@@ -84,6 +88,9 @@ aioc_error_t aioc_util_spi_write(uint8_t* data, uint32_t number_of_bytes)
 //==============================================================================
 aioc_error_t aioc_util_spi_read(uint8_t* data, uint32_t number_of_bytes)
 {
+#ifdef AIOC_HW_SIM
+  aioc_hw_sim_spi_read(data, number_of_bytes);
+#endif
   // TBD
   
   return error_none;

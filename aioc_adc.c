@@ -255,7 +255,6 @@ aioc_adc_init(aioc_adc_id_t aioc_adc_id, aioc_adc_handle_t* aioc_adc_handle)
 
   aioc_adc_context_t* aioc_adc_context =  &aioc_adc_context_table[aioc_adc_id];
 
-  aioc_adc_context->state = AIOC_ADC_STATE_REGISTER_MODE;
 
   e = aioc_util_spi_open(
         aioc_adc_context->spi_dev_id,
@@ -265,6 +264,9 @@ aioc_adc_init(aioc_adc_id_t aioc_adc_id, aioc_adc_handle_t* aioc_adc_handle)
   // Perform ADC self-check.
   e = aioc_adc_self_check();  
   if (e)  {  return e;  }
+  // Since we passed self check, setup internal state
+  // as register configuration mode.
+  aioc_adc_context->state = AIOC_ADC_STATE_REGISTER_MODE;
  
   // Configure the ADC
   e = aioc_adc_configure_single_cycle_mode();
@@ -273,15 +275,16 @@ aioc_adc_init(aioc_adc_id_t aioc_adc_id, aioc_adc_handle_t* aioc_adc_handle)
   // Start conversion mode.
   e = aioc_adc_to_conversion_mode();
   if (e)  {  return e;  }
-    
+// Since we passed configuration and ADC entered conversion mode,
+  // setup internal state to conversion mode.
+  // And pass back context pointer as a handle.
+  aioc_adc_context->state = AIOC_ADC_STATE_CONVERSION_MODE;
+  *aioc_adc_handle = (aioc_adc_handle_t)aioc_adc_context;
+     
   e = aioc_util_spi_close();
   if (e)  {  return e;  }
 
-  // Promote ADC state to conversion mode and pass back
-  // context pointer as a handle.
-  aioc_adc_context->state = AIOC_ADC_STATE_CONVERSION_MODE;
-  *aioc_adc_handle = (aioc_adc_handle_t)aioc_adc_context;
- 
+  
   return error_none;
 }
 
@@ -355,10 +358,12 @@ aioc_adc_self_check(void)
   data = 0;
   e = aioc_adc_register_read(STATUS_adrs, &data, 1);
   if (e)  {  return e;  }
-  if (STATUS_RESET_FLAG_read(data))
+  //TBD
+  // 
+  if (STATUS_RESET_FLAG_read(data) == 0)
   {
     return error_adc_self_check;
-  }  
+  }
   if (STATUS_SPI_ERROR_read(data))
   {
     return error_adc_self_check;
@@ -536,8 +541,6 @@ static uint8_t register_buffer[ADC_INSTRUCTION_SIZE + ADC_REGISTER_SIZE_MAX];
 //  SPI frame and the register address being read from or written to is
 //  automatically updated after each data phase (based on the selected address
 //  direction option)).
-// Assumptions:
-//   SOM is little endian.
 // SPI transactions are in 'network (big endian) order': see ADC datasheet
 //   Figure 93. Register Configuration Mode Timing Diagrams.
 // The ADC registers are little endian; see ADC datasheet, Multibyte Register Access: 
@@ -600,8 +603,7 @@ aioc_adc_register_write(
   uint32_t data_count)
 {
   aioc_error_t e = error_none;
-  const uint16_t read_flag = 0x8000;
-  uint16_t instruction = read_flag + ((uint16_t)register_adrs);
+  uint16_t instruction = ((uint16_t)register_adrs);
 
   // Check that there is data to read and that the data will fit.
   if ((data_count == 0) ||
@@ -622,7 +624,7 @@ aioc_adc_register_write(
   
   memcpy((uint8_t*)(register_buffer+ADC_INSTRUCTION_SIZE), data, data_count);
   
-  e = aioc_util_spi_read(register_buffer, (data_count + ADC_INSTRUCTION_SIZE));
+  e = aioc_util_spi_write(register_buffer, (data_count + ADC_INSTRUCTION_SIZE));
   if (e)  {  return e;  }
   
   return error_none;
@@ -672,8 +674,8 @@ aioc_adc_conversion_mode_command_register_configuration(void)
 // We're writing out 16 bits.  The command is left adjusted into MSB.
 // NOTE: Must be in conversion mode for this to work.
 // The way this works:
-//  SOM is little endian (assumption).
-//  SPI frame transactions are bit endian.
+//  SOM is little endian.
+//  SPI frame transactions are big endian.
 //  So put that MSB into lowest address.
 //==============================================================================
 // Endianess????
