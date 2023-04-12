@@ -34,10 +34,7 @@ aioc_error_t
 aioc_util_i2c_close(void);
 
 aioc_error_t
-aioc_util_spi_write(uint8_t* data, uint32_t number_of_bytes);
-
-aioc_error_t
-aioc_util_spi_read(uint8_t* data, uint32_t number_of_bytes);
+aioc_util_spi_transaction(uint8_t* data, uint32_t number_of_bytes);
 
 
 
@@ -49,7 +46,7 @@ aioc_error_t aioc_util_i2c_close(void);
 aioc_error_t aioc_util_i2c_write(
   uint32_t dev_adrs,
   uint32_t reg_adrs,
-  uint32_t num_bytes,
-  uint8_t* data);
+  uint8_t* data,
+  uint32_t num_bytes);
 
 #endif  // AIOC_UTIL_H

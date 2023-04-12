@@ -34,10 +34,7 @@ aioc_error_t
 aioc_util_i2c_close(void);
 
 aioc_error_t
-aioc_util_spi_write(uint8_t* data, uint32_t number_of_bytes);
-
-aioc_error_t
-aioc_util_spi_read(uint8_t* data, uint32_t number_of_bytes);
+aioc_util_spi_transaction(uint8_t* data, uint32_t number_of_bytes);
 
 
 

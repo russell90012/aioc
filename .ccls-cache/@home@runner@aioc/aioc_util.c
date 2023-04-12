@@ -2,11 +2,17 @@
 //==============================================================================
 #include "aioc_util.h"
 
+#include "aioc_hw_sim.h"
+
 
 //==============================================================================
 //==============================================================================
 aioc_error_t aioc_util_delay_ns(uint32_t delay)
 {
+#ifdef AIOC_HW_SIM
+  aioc_hw_sim_delay_ns(delay);
+#endif
+
   // TBD
 
   return error_none;
@@ -67,17 +73,11 @@ aioc_error_t aioc_util_spi_close(void)
 
 //==============================================================================
 //==============================================================================
-aioc_error_t aioc_util_spi_write(uint8_t* data, uint32_t number_of_bytes)
+aioc_error_t aioc_util_spi_transaction(uint8_t* data, uint32_t number_of_bytes)
 {
-  // TBD
-  
-  return error_none;
-}
-
-//==============================================================================
-//==============================================================================
-aioc_error_t aioc_util_spi_read(uint8_t* data, uint32_t number_of_bytes)
-{
+#ifdef AIOC_HW_SIM
+  aioc_hw_sim_spi_transaction(data, number_of_bytes);
+#endif
   // TBD
   
   return error_none;
@@ -125,11 +125,12 @@ aioc_error_t aioc_util_i2c_close(void)
 aioc_error_t aioc_util_i2c_write(
   uint32_t dev_adrs,
   uint32_t reg_adrs,
-  uint32_t num_bytes,
-  uint8_t* data)
+  uint8_t* data,
+  uint32_t num_bytes)
 {
 #ifdef AIOC_HW_SIM
-  aioc_hw_sim_i2c_write(dev_adrs, reg_adrs, data, data_count);
+  aioc_hw_sim_i2c_write(dev_adrs, reg_adrs, data, num_bytes);
 #endif
+  
   return error_none;
 }

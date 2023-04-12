@@ -12,13 +12,6 @@
 //==========================
 
 /**
- * Reset the five ADCs by pulsing the i2c gpio reset lines low.
- *
- * @return error handling result code.
- */
-static aioc_error_t aioc_reset_all_adc(void);
-
-/**
  * Map the aioc analog input id to an adc device handle and an adc input.
  *
  * @param analog_id is the analog input that gets mapped to the adc handle
@@ -36,6 +29,7 @@ static aioc_error_t map_ai_to_adc_handle_and_input(
               aioc_adc_input_t* adc_input);
 
 static aioc_adc_handle_t aioc_adc_handle_5v = 0;
+
 //==========================
 //==========================
 
@@ -53,10 +47,6 @@ aioc_init(void)
 
   // Configure the AIOC i2c GPIO.
   e = aioc_i2c_gpio_configure();
-  if (e)  {  return e;  }
-
-  // Reset the ADCs
-  e = aioc_reset_all_adc();
   if (e)  {  return e;  }
 
   // Initialize an ADC.
@@ -90,42 +80,6 @@ aioc_analog_input_conversion(aioc_analog_id_t analog_id, uint16_t* result)
 //================================
 // Private definitions.
 //================================
-
-//==============================================================================
-//==============================================================================
-static aioc_error_t
-aioc_reset_all_adc(void)
-{
-  aioc_error_t e = error_none;
-
-  // tRESETL is the minimum amount of time that RESET must be driven low,
-  // and tHWR_DELAY is the time that the digital host must wait between a
-  // RESET falling edge and starting an SPI frame.
-  //
-  // RESET Low Time:        tRESETL:    10 ns
-  // Hardware Reset Delay:  tHWR_DELAY: 310 µs
-  // Software Reset Delay:  tSWR_DELAY: 310 µs
-  
-  e = aioc_i2c_gpio_pin_pulse_low(A5V_3V3_ADC_RESET_N, 10);
-  if (e)  {  return e;  }
-  
-  e = aioc_i2c_gpio_pin_pulse_low(A7V_3V3_ADC_RESET_N, 10);
-  if (e)  {  return e;  }
-  
-  e = aioc_i2c_gpio_pin_pulse_low(A95mV_3V3_ADC_RESET_N, 10);
-  if (e)  {  return e;  }
-  
-  e = aioc_i2c_gpio_pin_pulse_low(ARTD_3V3_ADC_RESET_N, 10);
-  if (e)  {  return e;  }
-  
-  e = aioc_i2c_gpio_pin_pulse_low(EP10V_3V3_ADC_RESET_N, 10);
-  if (e)  {  return e;  }
- 
-  // Insert delay before any spi frames.
-  aioc_util_delay_ns(310000);
-  
-  return error_none;
-}
 
 //==============================================================================
 //==============================================================================

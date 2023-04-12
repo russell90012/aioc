@@ -362,6 +362,7 @@ aioc_i2c_gpio_pin_level_set( i2c_gpio_pin_name_t pin_name, uint32_t level)
     {
       data = BIT_CLR(data, pin);
     }
+    i2c_gpio_devices[device].regs.output[bank] = data;
     
     e = aioc_i2c_gpio_register_write(
           device_adrs,
@@ -451,7 +452,7 @@ aioc_i2c_gpio_register_write(
 {
   aioc_error_t  e = 0;
 
-  e = aioc_util_i2c_write(device_address, command_byte, 1, &data);
+  e = aioc_util_i2c_write(device_address, command_byte, &data, 1);
   if (e)  {  return e;  }
   
   return error_none;
