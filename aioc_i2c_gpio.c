@@ -243,6 +243,9 @@ aioc_i2c_gpio_configure(void)
   uint32_t bank = 0;
   uint32_t i2c_gpio_pin_configuration_table_size = 0;
   aioc_error_t e;
+#ifdef  AIOC_DEBUG
+printf("%s: enter\n", __FUNCTION__);
+#endif
   
   // Pupulate each device's register map then write it out to the devices.
   memset(&i2c_gpio_devices, 0, sizeof(i2c_gpio_devices));
@@ -272,6 +275,9 @@ aioc_i2c_gpio_configure(void)
   e = aioc_i2c_gpio_write_device_maps();
   if (e)  {  return e;  }
   
+#ifdef  AIOC_DEBUG
+printf("%s: exit\n", __FUNCTION__);
+#endif
   return error_none;
 }
 
@@ -285,6 +291,9 @@ aioc_i2c_gpio_pin_pulse_low(
   uint32_t pulse_duration) 
 {
   aioc_error_t e;
+#ifdef  AIOC_DEBUG
+printf("%s: enter\n", __FUNCTION__);
+#endif
 
   if (pin_name >= NUMBER_OF_GPIO_PINS)
   {
@@ -327,6 +336,9 @@ aioc_i2c_gpio_pin_pulse_low(
   e = aioc_util_i2c_close();
   if (e)  {  return e;  }
   
+#ifdef  AIOC_DEBUG
+printf("%s: exit\n", __FUNCTION__);
+#endif
   return error_none;
 }
 
@@ -336,6 +348,9 @@ aioc_error_t
 aioc_i2c_gpio_pin_level_set( i2c_gpio_pin_name_t pin_name, uint32_t level) 
 {
   aioc_error_t e;
+#ifdef  AIOC_DEBUG
+printf("%s: enter\n", __FUNCTION__);
+#endif
 
   if (pin_name >= NUMBER_OF_GPIO_PINS)
   {
@@ -375,6 +390,9 @@ aioc_i2c_gpio_pin_level_set( i2c_gpio_pin_name_t pin_name, uint32_t level)
   e = aioc_util_i2c_close();
   if (e)  {  return e;  }
   
+#ifdef  AIOC_DEBUG
+printf("%s: exit\n", __FUNCTION__);
+#endif
   return error_none;
 }
 

@@ -65,10 +65,6 @@
 #define ADC_REGISTER_SIZE_MAX 32
 #define ADC_INSTRUCTION_SIZE 2
 
-#define CONVERSION_MODE_COMMAND_channel_selection(channel_number)              \
-  (0x10 + (channel_number & 0xF))
-#define CONVERSION_MODE_COMMAND_register_configuration_mode (0xA)
-
 //==============================================================================
 //==============================================================================
 
@@ -267,7 +263,10 @@ aioc_adc_init(
   aioc_adc_handle_t *aioc_adc_handle)
 {
   aioc_error_t e = error_none;
-
+#ifdef  AIOC_DEBUG
+printf("%s: enter\n", __FUNCTION__);
+#endif
+ 
   *aioc_adc_handle = 0;
 
   if (aioc_adc_id >= NUMBER_OF_AIOC_ADC_IDS)
@@ -311,7 +310,10 @@ aioc_adc_init(
   e = aioc_util_spi_close();
   if (e) {  return e;  }
 
-  return error_none;
+#ifdef  AIOC_DEBUG
+printf("%s: exit\n", __FUNCTION__);
+#endif
+   return error_none;
 }
 
 //==============================================================================
@@ -324,6 +326,9 @@ aioc_adc_convert_single_cycle(
 {
   aioc_error_t e = error_none;
   aioc_adc_context_t *aioc_adc_context = (aioc_adc_context_t *)adc_handle;
+#ifdef  AIOC_DEBUG
+printf("%s: enter\n", __FUNCTION__);
+#endif
 
   // Check that we're in conversion mode.
   if (aioc_adc_context->state != AIOC_ADC_STATE_CONVERSION_MODE)
@@ -357,6 +362,9 @@ aioc_adc_convert_single_cycle(
   e = aioc_util_spi_close();
   if (e) {  return e;  }
 
+#ifdef  AIOC_DEBUG
+printf("%s: exit\n", __FUNCTION__);
+#endif
   return error_none;
 }
 
@@ -399,6 +407,9 @@ aioc_adc_self_check(void)
 {
   aioc_error_t e = error_none;
   uint8_t data;
+#ifdef  AIOC_DEBUG
+printf("%s: enter\n", __FUNCTION__);
+#endif
 
   // Check the Device Status Register for reset flag or spi error.
   data = 0;
@@ -453,6 +464,9 @@ aioc_adc_self_check(void)
     return error_adc_self_check;
   }
 
+#ifdef  AIOC_DEBUG
+printf("%s: exit\n", __FUNCTION__);
+#endif
   return error_none;
 }
 
@@ -463,6 +477,9 @@ aioc_adc_configure_single_cycle_mode(void)
 {
   aioc_error_t e = error_none;
   uint8_t data;
+#ifdef  AIOC_DEBUG
+printf("%s: enter\n", __FUNCTION__);
+#endif
 
   // Setup the channel sequencing for Single-cycle mode.
   //
@@ -529,6 +546,9 @@ aioc_adc_configure_single_cycle_mode(void)
         AD469x_GP_MODE_BUSY_GP_SEL(0));
   if (e) {  return e;  }
 
+#ifdef  AIOC_DEBUG
+printf("%s: exit\n", __FUNCTION__);
+#endif
   return error_none;
 }
 
@@ -617,7 +637,7 @@ aioc_adc_register_read(
   // (possibly multi-byte) register.
   instruction += (uint16_t)(data_count - 1);
 
-  register_buffer[0] = (uint8_t)((instruction >> 8) & 0x7F); // MSB
+  register_buffer[0] = (uint8_t)((instruction >> 8) & 0xFF); // MSB
   register_buffer[1] = (uint8_t)((instruction)&0xFF);        // LSB
 
   e = aioc_util_spi_transaction(
@@ -706,8 +726,7 @@ aioc_adc_conversion_mode_command_channel_selection(uint32_t input)
   aioc_error_t e = error_none;
 
   // Issue specific input channel selection command.
-  e = aioc_adc_conversion_mode_command_issue(
-        CONVERSION_MODE_COMMAND_channel_selection(input));
+  e = aioc_adc_conversion_mode_command_issue(0x10 + (input & 0xF));
   if (e) {  return e;  }
 
   return error_none;
@@ -723,8 +742,7 @@ aioc_adc_conversion_mode_exit(void)
 
   // Put the ADC into Register configuration mode.
   // NOTE: This ASSUMES the ADC is in Conversion mode.
-  e = aioc_adc_conversion_mode_command_issue(
-        CONVERSION_MODE_COMMAND_register_configuration_mode);
+  e = aioc_adc_conversion_mode_command_issue(0x0A);
   if (e) {  return e;  }
 
   return error_none;
@@ -746,8 +764,7 @@ aioc_adc_conversion_mode_command_issue(uint32_t command)
   uint8_t data[2] = {0, 0};
 
   // Left adjust command
-  data[0] = (uint8_t)(command & 0x1F);
-  data[0] = data[0] << 3;
+  data[0] = (uint8_t)(((command & 0x1F) << 3) & 0xFF);
   data[1] = 0;
 
   e = aioc_util_spi_transaction(data, 2);

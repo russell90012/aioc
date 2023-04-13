@@ -28,6 +28,10 @@ aioc_error_t aioc_util_ultrascale_gpio_pulse_low(
   uint32_t pulse_duration)
 {
   // TBD
+#ifdef  AIOC_DEBUG
+printf("%s: convert_id [%d], duration [%d]\n", __FUNCTION__,
+  convert_id, pulse_duration);
+#endif
   
   return error_none;
 }

@@ -31,10 +31,10 @@ void aioc_hw_sim_spi_transaction(uint8_t* data, uint32_t data_count)
   // If it's two then it's a conversion mode transaction.
   // If it's three or more then it's reg transaction.
   
-  static uint32_t reset_flag = 1;
+  static uint32_t reset_flag = 1 << 5;
   static uint8_t scratch_pad = 0x00;
  
-  printf("%s : data_count [%d], data [0x%02X] [0x%02X] [0x%02X]\n",
+  printf("%s : enter: data_count [%d], data [0x%02X] [0x%02X] [0x%02X]\n",
     __FUNCTION__, data_count, data[0], data[1], data[2]);
 
   if (data_count < 3)
@@ -60,7 +60,7 @@ void aioc_hw_sim_spi_transaction(uint8_t* data, uint32_t data_count)
       {
         case 0x0014:  // STATUS reg
           // Send back reset flag then clear it.
-          data[2] = reset_flag << 0x5;
+          data[2] = reset_flag;
           reset_flag = 0;
           break;
         case 0x000C:  // VENDOR_L
@@ -78,26 +78,14 @@ void aioc_hw_sim_spi_transaction(uint8_t* data, uint32_t data_count)
         default:
           break;
        }
+    }
+    else
     {
       // It's register WRITE.
       
       // switch on register address.
       switch (instruction)
       {
-        case 0x0014:  // STATUS reg
-          // Send back reset flag then clear it.
-          data[2] = reset_flag << 0x5;
-          reset_flag = 0;
-          break;
-        case 0x000C:  // VENDOR_L
-          data[2] = 0x56;
-          break;
-        case 0x000D:  // VENDOR_H
-          data[2] = 0x04;
-          break;
-        case 0x0003:  // DEVICE_TYPE;
-          data[2] = 0x07;
-          break;
         case 0x000A:
           scratch_pad = 0x00;
           scratch_pad = data[2];
@@ -106,8 +94,8 @@ void aioc_hw_sim_spi_transaction(uint8_t* data, uint32_t data_count)
           break;
       }
     }
-   }
-     
   }
+  printf("%s : exit : data_count [%d], data [0x%02X] [0x%02X] [0x%02X]\n",
+    __FUNCTION__, data_count, data[0], data[1], data[2]);
 }
 
