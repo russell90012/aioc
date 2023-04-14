@@ -31,8 +31,8 @@
 #define DEVICE_TYPE_reset 0x07
 
 /* AD469x_REG_SETUP */
-#define AD469x_SETUP_IF_MODE_MASK (0x01 << 2)
-#define AD469x_SETUP_IF_MODE_CONV (0x01 << 2)
+#define AD469x_SETUP_SPI_MODE_MASK (0x01 << 2)
+#define AD469x_SETUP_SPI_MODE_CONV (0x01 << 2)
 #define AD469x_SETUP_CYC_CTRL_MASK (0x01 << 1)
 #define AD469x_SETUP_CYC_CTRL_SINGLE(x) ((x & 0x01) << 1)
 
@@ -203,7 +203,7 @@ static aioc_error_t aioc_adc_conversion_mode_exit(void);
  * @note the ADC we're using here is specifed by the SPI device.  And
  *       that device was opened using the ADC context info.
  */
-static aioc_error_t aioc_adc_conversion_mode_command_issue(uint32_t command);
+static aioc_error_t aioc_adc_conversion_mode_command_write(uint32_t command);
 
 /**
  * Read conversion result from ADC whilest in conversion mode.
@@ -563,8 +563,8 @@ aioc_adc_conversion_mode_enter(void)
   // Put the ADC into Conversion mode.
   e = aioc_adc_register_mask_write(
         SETUP_adrs,
-        AD469x_SETUP_IF_MODE_MASK,
-        AD469x_SETUP_IF_MODE_CONV);
+        AD469x_SETUP_SPI_MODE_MASK,
+        AD469x_SETUP_SPI_MODE_CONV);
   if (e) {  return e;  }
 
   // Delay for transit from Register mode to Converstion mode.
@@ -726,7 +726,7 @@ aioc_adc_conversion_mode_command_channel_selection(uint32_t input)
   aioc_error_t e = error_none;
 
   // Issue specific input channel selection command.
-  e = aioc_adc_conversion_mode_command_issue(0x10 + (input & 0xF));
+  e = aioc_adc_conversion_mode_command_write(0x10 + (input & 0xF));
   if (e) {  return e;  }
 
   return error_none;
@@ -742,7 +742,7 @@ aioc_adc_conversion_mode_exit(void)
 
   // Put the ADC into Register configuration mode.
   // NOTE: This ASSUMES the ADC is in Conversion mode.
-  e = aioc_adc_conversion_mode_command_issue(0x0A);
+  e = aioc_adc_conversion_mode_command_write(0x0A);
   if (e) {  return e;  }
 
   return error_none;
@@ -758,7 +758,7 @@ aioc_adc_conversion_mode_exit(void)
 //  So put that MSB into lowest address.
 //==============================================================================
 static aioc_error_t
-aioc_adc_conversion_mode_command_issue(uint32_t command)
+aioc_adc_conversion_mode_command_write(uint32_t command)
 {
   aioc_error_t e = error_none;
   uint8_t data[2] = {0, 0};
