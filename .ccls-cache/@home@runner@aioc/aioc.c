@@ -2,8 +2,6 @@
 // TBD
 
 #include "aioc.h"
-#include "aioc_i2c_gpio.h"
-#include "aioc_util.h"
 #include "aioc_adc.h"
 
 
@@ -24,12 +22,15 @@
  * @return error handling result code.
  */
 static aioc_error_t map_ai_to_adc_handle_and_input(
-              aioc_analog_id_t analog_id,
-              aioc_adc_handle_t* adc_handle,
-              aioc_adc_input_t* adc_input);
+        aioc_analog_id_t analog_id,
+        struct aioc_adc_dev** dev,
+        aioc_adc_input_t* adc_input);
+    
+//==========================
+//==========================
+static struct aioc_adc_dev* aioc_adc_dev_5v = 0;
 
-static aioc_adc_handle_t aioc_adc_handle_5v = 0;
-
+static struct aioc_util_i2c_descriptor* i2c_desc;
 //==========================
 //==========================
 
@@ -45,12 +46,48 @@ aioc_init(void)
 {
   aioc_error_t e = error_none;
 
+  // Initialize the i2c bus descriptor.
+  e = aioc_util_i2c_init(&i2c_desc);
+  if (e)  {  return e;  }
+
   // Configure the AIOC i2c GPIO.
   e = aioc_i2c_gpio_configure();
   if (e)  {  return e;  }
 
-  // Initialize an ADC.
-  e = aioc_adc_init(AIOC_ADC_ID_5V, &aioc_adc_handle_5v);
+  // Fill in parameter structures for 5V ADC.  Then initialize it.
+  struct aioc_spi_parm_init spi_parm_init =
+  {
+    .dev_id = 0,
+    .cs_id = 0,
+  };
+  
+ 	struct aioc_i2c_gpio_parm_init gpio_parm_init_reset_n = 
+  {
+    .line = A5V_3V3_ADC_RESET_N,
+    .desc = i2c_desc,
+  };
+  
+ 	struct aioc_i2c_gpio_parm_init gpio_parm_init_busy = 
+  {
+    .line = A5V_3V3_ADC_BUSY,
+    .desc = i2c_desc,
+  };
+  
+	struct aioc_i2c_gpio_parm_init gpio_parm_init_convert = 
+  {
+    .line = 0,
+    .desc = i2c_desc,
+  };
+  
+  struct aioc_adc_parm_init  adc_parm_init_5v =
+  {
+    .spi_parm_init =     &spi_parm_init,
+    .gpio_parm_init_reset_n = &gpio_parm_init_reset_n,
+    .gpio_parm_init_busy = &gpio_parm_init_busy,
+    .gpio_parm_init_convert = &gpio_parm_init_convert,
+  };
+  
+  e = aioc_adc_init(&aioc_adc_dev_5v, &adc_parm_init_5v);
   if (e)  {  return e;  }
 
   return error_none;
@@ -64,13 +101,13 @@ aioc_analog_input_conversion(aioc_analog_id_t analog_id, uint16_t* result)
 {
   aioc_error_t e = error_none;
 
-  aioc_adc_handle_t adc_handle = 0;
+  static struct aioc_adc_dev* dev = 0;
   aioc_adc_input_t adc_input = 0;
   
-  e = map_ai_to_adc_handle_and_input(analog_id, &adc_handle, &adc_input);
+  e = map_ai_to_adc_handle_and_input(analog_id, &dev, &adc_input);
   if (e)  {  return e;  }      
 
-  e = aioc_adc_convert_single_cycle(adc_handle, adc_input, result);
+  e = aioc_adc_convert_single_cycle(dev, adc_input, result);
   if (e)  {  return e;  }     
 
   return error_none;
@@ -86,34 +123,34 @@ aioc_analog_input_conversion(aioc_analog_id_t analog_id, uint16_t* result)
 static aioc_error_t
 map_ai_to_adc_handle_and_input(
     aioc_analog_id_t analog_id,
-    aioc_adc_handle_t* adc_handle,
+    struct aioc_adc_dev** device,
     aioc_adc_input_t* adc_input)
 {
   aioc_error_t e = error_none;
   aioc_adc_input_t input = 0;
-  aioc_adc_handle_t handle = 0;
+  struct aioc_adc_dev* dev = 0;
 
   switch(analog_id)
   { 
     // AI Analog 0-5 VDC
     case AIOC_AI_LEFT_FWD_OVER_PRESSURE_SENSOR:
       input = A5V_00_MON;
-      handle = aioc_adc_handle_5v;
+      dev = aioc_adc_dev_5v;
       break;
     
     case AIOC_AI_LEFT_AFT_OVER_PRESSURE_SENSOR:
       input = A5V_01_MON;
-      handle = aioc_adc_handle_5v;
+      dev = aioc_adc_dev_5v;
       break;
     
     case AIOC_AI_RIGHT_FWD_OVER_PRESSURE_SENSOR:
       input = A5V_02_MON;
-      handle = aioc_adc_handle_5v;
+      dev = aioc_adc_dev_5v;
       break;
     
     case AIOC_AI_RIGHT_AFT_OVER_PRESSURE_SENSOR:
       input = A5V_03_MON;
-      handle = aioc_adc_handle_5v;
+      dev = aioc_adc_dev_5v;
       break;
     
     // NOT DOING THESE FOR NOW
@@ -123,22 +160,22 @@ map_ai_to_adc_handle_and_input(
 
     case AIOC_AI_AFT_RIGHT_FEEDPIPE_PRESSURE_SENSOR:
       input = A5V_07_MON;
-      handle = aioc_adc_handle_5v;
+      dev = aioc_adc_dev_5v;
       break;
     
     case AIOC_AI_FWD_LEFT_FEEDPIPE_PRESSURE_SENSOR:
       input = A5V_08_MON;
-      handle = aioc_adc_handle_5v;
+      dev = aioc_adc_dev_5v;
       break;
     
     case AIOC_AI_AFT_LEFT_FEEDPIPE_PRESSURE_SENSOR:
       input = A5V_09_MON;
-      handle = aioc_adc_handle_5v;
+      dev = aioc_adc_dev_5v;
       break;
     
     case AIOC_AI_FWD_RIGHT_FEEDPIPE_PRESSURE_SENSOR:
       input = A5V_10_MON;
-      handle = aioc_adc_handle_5v;
+      dev = aioc_adc_dev_5v;
       break;
 
     // NOT DOING THESE FOR NOW
@@ -200,7 +237,7 @@ map_ai_to_adc_handle_and_input(
     }
   
   *adc_input = input;
-  *adc_handle = handle;
+  *device = dev;
 
   return error_none;
 }

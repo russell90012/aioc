@@ -16,6 +16,7 @@
 typedef struct
 {
   uint32_t device_adrs;
+  uint32_t device;
   uint32_t bank;
   uint32_t pin;
   uint32_t configuration;
@@ -26,119 +27,119 @@ i2c_gpio_pin_conf_t;
     
 i2c_gpio_pin_conf_t i2c_gpio_pin_configuration_table[] =
 {
-  {0X20, 0, 0, 0, 0, 0},   // A5V_SW_BANK1_A0,
-  {0X20, 0, 1, 0, 0, 0},   // A5V_SW_BANK2_A0,
-  {0X20, 0, 2, 0, 0, 0},   // A5V_SW_BANK1_A1,
-  {0X20, 0, 3, 0, 0, 0},   // A5V_SW_BANK2_A1,
-  {0X20, 0, 4, 0, 0, 1},   // A5V_SW_BANK1_EN,
-  {0X20, 0, 5, 0, 0, 1},   // A5V_SW_BANK2_EN,
-  {0X20, 0, 6, 0, 0, 1},   // A5V_3V3_ADC_RESET_N,
-  {0X20, 0, 7, 1, 0, 0},   // A5V_3V3_ADC_BUSY,
+  {0X20, 0, 0, 0, 0, 0, 0},   // A5V_SW_BANK1_A0,
+  {0X20, 0, 0, 1, 0, 0, 0},   // A5V_SW_BANK2_A0,
+  {0X20, 0, 0, 2, 0, 0, 0},   // A5V_SW_BANK1_A1,
+  {0X20, 0, 0, 3, 0, 0, 0},   // A5V_SW_BANK2_A1,
+  {0X20, 0, 0, 4, 0, 0, 1},   // A5V_SW_BANK1_EN,
+  {0X20, 0, 0, 5, 0, 0, 1},   // A5V_SW_BANK2_EN,
+  {0X20, 0, 0, 6, 0, 0, 1},   // A5V_3V3_ADC_RESET_N,
+  {0X20, 0, 0, 7, 1, 0, 0},   // A5V_3V3_ADC_BUSY,
 
-  {0X20, 1, 0, 0, 0, 0},   // A7V_SW_BANK1_A0,
-  {0X20, 1, 1, 0, 0, 0},   // A7V_SW_BANK2_A0,
-  {0X20, 1, 2, 0, 0, 0},   // A7V_SW_BANK1_A1,
-  {0X20, 1, 3, 0, 0, 0},   // A7V_SW_BANK2_A1,
-  {0X20, 1, 4, 0, 0, 1},   // A7V_SW_BANK1_EN,
-  {0X20, 1, 5, 0, 0, 1},   // A7V_SW_BANK2_EN,
-  {0X20, 1, 6, 0, 0, 1},   // A7V_3V3_ADC_RESET_N,
-  {0X20, 1, 7, 1, 0, 0},   // A7V_3V3_ADC_BUSY,
-
-
-  {0X21, 0, 0, 0, 0, 0},   // A95mV_SW_BANK1_A0,
-  {0X21, 0, 1, 0, 0, 0},   // A95mV_SW_BANK2_A0,
-  {0X21, 0, 2, 0, 0, 0},   // A95mV_SW_BANK1_A1,
-  {0X21, 0, 3, 0, 0, 0},   // A95mV_SW_BANK2_A1,
-  {0X21, 0, 4, 0, 0, 1},   // A95mV_SW_BANK1_EN,
-  {0X21, 0, 5, 0, 0, 1},   // A95mV_SW_BANK2_EN,
-  {0X21, 0, 6, 0, 0, 1},   // A95mV_3V3_ADC_RESET_N,
-  {0X21, 0, 7, 1, 0, 0},   // A95mV_3V3_ADC_BUSY,
-
-  {0X21, 1, 0, 0, 0, 0},   // ARTD_SW_A0,
-  {0X21, 1, 1, 0, 0, 0},   // ARTD_SW_A1,
-  {0X21, 1, 2, 0, 0, 1},   // ARTD_SW_EN,
-  {0X21, 1, 3, 0, 0, 1},   // ARTD_3V3_ADC_RESET_N,
-  {0X21, 1, 4, 1, 0, 0},   // ARTD_3V3_ADC_BUSY,
-  {0X21, 1, 5, 0, 0, 1},   // EP10V_3V3_ADC_RESET_N,
-  {0X21, 1, 6, 1, 0, 0},   // EP10V_3V3_ADC_BUSY,
-  {0X21, 1, 7, 1, 0, 0},   // NC_0, 
+  {0X20, 0, 1, 0, 0, 0, 0},   // A7V_SW_BANK1_A0,
+  {0X20, 0, 1, 1, 0, 0, 0},   // A7V_SW_BANK2_A0,
+  {0X20, 0, 1, 2, 0, 0, 0},   // A7V_SW_BANK1_A1,
+  {0X20, 0, 1, 3, 0, 0, 0},   // A7V_SW_BANK2_A1,
+  {0X20, 0, 1, 4, 0, 0, 1},   // A7V_SW_BANK1_EN,
+  {0X20, 0, 1, 5, 0, 0, 1},   // A7V_SW_BANK2_EN,
+  {0X20, 0, 1, 6, 0, 0, 1},   // A7V_3V3_ADC_RESET_N,
+  {0X20, 0, 1, 7, 1, 0, 0},   // A7V_3V3_ADC_BUSY,
 
 
-  {0X22, 0, 0, 0, 0, 0},   // A10V_SW_A0,
-  {0X22, 0, 1, 0, 0, 0},   // A10V_SW_A1,
-  {0X22, 0, 2, 0, 0, 1},   // A10V_SW_EN,
-  {0X22, 0, 3, 1, 0, 0},   // A5V_ADC_PG,
-  {0X22, 0, 4, 1, 0, 0},   // A7V_ADC_PG,
-  {0X22, 0, 5, 1, 0, 0},   // A95mV_ADC_PG,
-  {0X22, 0, 6, 1, 0, 0},   // ARTD_ADC_PG,
-  {0X22, 0, 7, 1, 0, 0},   // EP10V_ADC_PG,
+  {0X21, 1, 0, 0, 0, 0, 0},   // A95mV_SW_BANK1_A0,
+  {0X21, 1, 0, 1, 0, 0, 0},   // A95mV_SW_BANK2_A0,
+  {0X21, 1, 0, 2, 0, 0, 0},   // A95mV_SW_BANK1_A1,
+  {0X21, 1, 0, 3, 0, 0, 0},   // A95mV_SW_BANK2_A1,
+  {0X21, 1, 0, 4, 0, 0, 1},   // A95mV_SW_BANK1_EN,
+  {0X21, 1, 0, 5, 0, 0, 1},   // A95mV_SW_BANK2_EN,
+  {0X21, 1, 0, 6, 0, 0, 1},   // A95mV_3V3_ADC_RESET_N,
+  {0X21, 1, 0, 7, 1, 0, 0},   // A95mV_3V3_ADC_BUSY,
 
-  {0X22, 1, 0, 0, 0, 0},   // AZ_EL_SW_A0,
-  {0X22, 1, 1, 0, 0, 0},   // AZ_EL_SW_A1,
-  {0X22, 1, 2, 0, 0, 1},   // AZ_EL_SW_EN,
-  {0X22, 1, 3, 0, 0, 1},   // RTD_EXC_00_OFF_ON_N,
-  {0X22, 1, 4, 0, 0, 1},   // RTD_EXC_01_OFF_ON_N,
-  {0X22, 1, 5, 0, 0, 1},   // RTD_EXC_02_OFF_ON_N,
-  {0X22, 1, 6, 0, 0, 1},   // RTD_EXC_03_OFF_ON_N,
-  {0X22, 1, 7, 0, 0, 1},   // RTD_EXC_04_OFF_ON_N,
+  {0X21, 1, 1, 0, 0, 0, 0},   // ARTD_SW_A0,
+  {0X21, 1, 1, 1, 0, 0, 0},   // ARTD_SW_A1,
+  {0X21, 1, 1, 2, 0, 0, 1},   // ARTD_SW_EN,
+  {0X21, 1, 1, 3, 0, 0, 1},   // ARTD_3V3_ADC_RESET_N,
+  {0X21, 1, 1, 4, 1, 0, 0},   // ARTD_3V3_ADC_BUSY,
+  {0X21, 1, 1, 5, 0, 0, 1},   // EP10V_3V3_ADC_RESET_N,
+  {0X21, 1, 1, 6, 1, 0, 0},   // EP10V_3V3_ADC_BUSY,
+  {0X21, 1, 1, 7, 1, 0, 0},   // NC_0, 
+
+
+  {0X22, 2, 0, 0, 0, 0, 0},   // A10V_SW_A0,
+  {0X22, 2, 0, 1, 0, 0, 0},   // A10V_SW_A1,
+  {0X22, 2, 0, 2, 0, 0, 1},   // A10V_SW_EN,
+  {0X22, 2, 0, 3, 1, 0, 0},   // A5V_ADC_PG,
+  {0X22, 2, 0, 4, 1, 0, 0},   // A7V_ADC_PG,
+  {0X22, 2, 0, 5, 1, 0, 0},   // A95mV_ADC_PG,
+  {0X22, 2, 0, 6, 1, 0, 0},   // ARTD_ADC_PG,
+  {0X22, 2, 0, 7, 1, 0, 0},   // EP10V_ADC_PG,
+
+  {0X22, 2, 1, 0, 0, 0, 0},   // AZ_EL_SW_A0,
+  {0X22, 2, 1, 1, 0, 0, 0},   // AZ_EL_SW_A1,
+  {0X22, 2, 1, 2, 0, 0, 1},   // AZ_EL_SW_EN,
+  {0X22, 2, 1, 3, 0, 0, 1},   // RTD_EXC_00_OFF_ON_N,
+  {0X22, 2, 1, 4, 0, 0, 1},   // RTD_EXC_01_OFF_ON_N,
+  {0X22, 2, 1, 5, 0, 0, 1},   // RTD_EXC_02_OFF_ON_N,
+  {0X22, 2, 1, 6, 0, 0, 1},   // RTD_EXC_03_OFF_ON_N,
+  {0X22, 2, 1, 7, 0, 0, 1},   // RTD_EXC_04_OFF_ON_N,
 
 
 
-  {0x23, 0, 0, 0, 0, 0},   // EP10V_00_EN,
-  {0x23, 0, 1, 0, 0, 0},   // EP10V_01_EN,
-  {0x23, 0, 2, 0, 0, 0},   // EP10V_02_EN,
-  {0x23, 0, 3, 0, 0, 0},   // EP10V_03_EN,
-  {0x23, 0, 4, 0, 0, 0},   // EP10V_04_EN,
-  {0x23, 0, 5, 0, 0, 0},   // EP10V_05_EN,
-  {0x23, 0, 6, 0, 0, 0},   // EP10V_06_EN,
-  {0x23, 0, 7, 0, 0, 0},   // EP10V_07_EN,
+  {0x23, 3, 0, 0, 0, 0, 0},   // EP10V_00_EN,
+  {0x23, 3, 0, 1, 0, 0, 0},   // EP10V_01_EN,
+  {0x23, 3, 0, 2, 0, 0, 0},   // EP10V_02_EN,
+  {0x23, 3, 0, 3, 0, 0, 0},   // EP10V_03_EN,
+  {0x23, 3, 0, 4, 0, 0, 0},   // EP10V_04_EN,
+  {0x23, 3, 0, 5, 0, 0, 0},   // EP10V_05_EN,
+  {0x23, 3, 0, 6, 0, 0, 0},   // EP10V_06_EN,
+  {0x23, 3, 0, 7, 0, 0, 0},   // EP10V_07_EN,
                            // 
-  {0x23, 1, 0, 0, 0, 0},   // EP10V_08_EN,
-  {0x23, 1, 1, 0, 0, 0},   // EP10V_09_EN,
-  {0x23, 1, 2, 0, 0, 0},   // EP10V_10_EN,
-  {0x23, 1, 3, 0, 0, 0},   // EP10V_11_EN,
-  {0x23, 1, 4, 0, 0, 0},   // P10V_POWER_EN,  
-  {0x23, 1, 5, 1, 0, 0},   // NC_1,      
-  {0x23, 1, 6, 1, 0, 0},   // NC_2,      
-  {0x23, 1, 7, 1, 0, 0},   // NC_3,      
+  {0x23, 3, 1, 0, 0, 0, 0},   // EP10V_08_EN,
+  {0x23, 3, 1, 1, 0, 0, 0},   // EP10V_09_EN,
+  {0x23, 3, 1, 2, 0, 0, 0},   // EP10V_10_EN,
+  {0x23, 3, 1, 3, 0, 0, 0},   // EP10V_11_EN,
+  {0x23, 3, 1, 4, 0, 0, 0},   // P10V_POWER_EN,  
+  {0x23, 3, 1, 5, 1, 0, 0},   // NC_1,      
+  {0x23, 3, 1, 6, 1, 0, 0},   // NC_2,      
+  {0x23, 3, 1, 7, 1, 0, 0},   // NC_3,      
 
 
-  {0X24, 0, 0, 1, 0, 0},   // EP10V_00_PG_N,
-  {0X24, 0, 1, 1, 0, 0},   // EP10V_01_PG_N,
-  {0X24, 0, 2, 1, 0, 0},   // EP10V_02_PG_N,
-  {0X24, 0, 3, 1, 0, 0},   // EP10V_03_PG_N,
-  {0X24, 0, 4, 1, 0, 0},   // EP10V_04_PG_N,
-  {0X24, 0, 5, 1, 0, 0},   // EP10V_05_PG_N,
-  {0X24, 0, 6, 1, 0, 0},   // EP10V_06_PG_N,
-  {0X24, 0, 7, 1, 0, 0},   // EP10V_07_PG_N,
+  {0X24, 4, 0, 0, 1, 0, 0},   // EP10V_00_PG_N,
+  {0X24, 4, 0, 1, 1, 0, 0},   // EP10V_01_PG_N,
+  {0X24, 4, 0, 2, 1, 0, 0},   // EP10V_02_PG_N,
+  {0X24, 4, 0, 3, 1, 0, 0},   // EP10V_03_PG_N,
+  {0X24, 4, 0, 4, 1, 0, 0},   // EP10V_04_PG_N,
+  {0X24, 4, 0, 5, 1, 0, 0},   // EP10V_05_PG_N,
+  {0X24, 4, 0, 6, 1, 0, 0},   // EP10V_06_PG_N,
+  {0X24, 4, 0, 7, 1, 0, 0},   // EP10V_07_PG_N,
                            // 
-  {0X24, 1, 0, 1, 0, 0},   // EP10V_08_PG_N,
-  {0X24, 1, 1, 1, 0, 0},   // EP10V_09_PG_N,
-  {0X24, 1, 2, 1, 0, 0},   // EP10V_10_PG_N,
-  {0X24, 1, 3, 1, 0, 0},   // EP10V_11_PG_N,
-  {0X24, 1, 4, 1, 0, 0},   // P10V_PG_0,     
-  {0X24, 1, 5, 1, 0, 0},   // P10V_PG_1,     
-  {0X24, 1, 6, 1, 0, 0},   // NC_4,         
-  {0X24, 1, 7, 1, 0, 0},   // NC_5,         
+  {0X24, 4, 1, 0, 1, 0, 0},   // EP10V_08_PG_N,
+  {0X24, 4, 1, 1, 1, 0, 0},   // EP10V_09_PG_N,
+  {0X24, 4, 1, 2, 1, 0, 0},   // EP10V_10_PG_N,
+  {0X24, 4, 1, 3, 1, 0, 0},   // EP10V_11_PG_N,
+  {0X24, 4, 1, 4, 1, 0, 0},   // P10V_PG_0,     
+  {0X24, 4, 1, 5, 1, 0, 0},   // P10V_PG_1,     
+  {0X24, 4, 1, 6, 1, 0, 0},   // NC_4,         
+  {0X24, 4, 1, 7, 1, 0, 0},   // NC_5,         
 
 
-  {0X25, 0, 0, 1, 0, 0},   // EP10V_00_FLG_N,
-  {0X25, 0, 1, 1, 0, 0},   // EP10V_01_FLG_N,
-  {0X25, 0, 2, 1, 0, 0},   // EP10V_02_FLG_N,
-  {0X25, 0, 3, 1, 0, 0},   // EP10V_03_FLG_N,
-  {0X25, 0, 4, 1, 0, 0},   // EP10V_04_FLG_N,
-  {0X25, 0, 5, 1, 0, 0},   // EP10V_05_FLG_N,
-  {0X25, 0, 6, 1, 0, 0},   // EP10V_06_FLG_N,
-  {0X25, 0, 7, 1, 0, 0},   // EP10V_07_FLG_N,
+  {0X25, 5, 0, 0, 1, 0, 0},   // EP10V_00_FLG_N,
+  {0X25, 5, 0, 1, 1, 0, 0},   // EP10V_01_FLG_N,
+  {0X25, 5, 0, 2, 1, 0, 0},   // EP10V_02_FLG_N,
+  {0X25, 5, 0, 3, 1, 0, 0},   // EP10V_03_FLG_N,
+  {0X25, 5, 0, 4, 1, 0, 0},   // EP10V_04_FLG_N,
+  {0X25, 5, 0, 5, 1, 0, 0},   // EP10V_05_FLG_N,
+  {0X25, 5, 0, 6, 1, 0, 0},   // EP10V_06_FLG_N,
+  {0X25, 5, 0, 7, 1, 0, 0},   // EP10V_07_FLG_N,
 
-  {0X25, 1, 0, 1, 0, 0},   // EP10V_08_FLG_N,
-  {0X25, 1, 1, 1, 0, 0},   // EP10V_09_FLG_N,
-  {0X25, 1, 2, 1, 0, 0},   // EP10V_10_FLG_N,
-  {0X25, 1, 3, 1, 0, 0},   // EP10V_11_FLG_N,
-  {0X25, 1, 4, 1, 0, 0},   // NC_6,       
-  {0X25, 1, 5, 1, 0, 0},   // NC_7,       
-  {0X25, 1, 6, 1, 0, 0},   // NC_8,       
-  {0X25, 1, 7, 1, 0, 0},   // NC_9,       
+  {0X25, 5, 1, 0, 1, 0, 0},   // EP10V_08_FLG_N,
+  {0X25, 5, 1, 1, 1, 0, 0},   // EP10V_09_FLG_N,
+  {0X25, 5, 1, 2, 1, 0, 0},   // EP10V_10_FLG_N,
+  {0X25, 5, 1, 3, 1, 0, 0},   // EP10V_11_FLG_N,
+  {0X25, 5, 1, 4, 1, 0, 0},   // NC_6,       
+  {0X25, 5, 1, 5, 1, 0, 0},   // NC_7,       
+  {0X25, 5, 1, 6, 1, 0, 0},   // NC_8,       
+  {0X25, 5, 1, 7, 1, 0, 0},   // NC_9,       
 };
 
 // The i2c GPIO register map (along with addresses).
@@ -242,6 +243,9 @@ aioc_i2c_gpio_configure(void)
   uint32_t bank = 0;
   uint32_t i2c_gpio_pin_configuration_table_size = 0;
   aioc_error_t e;
+#ifdef  AIOC_DEBUG
+printf("%s: enter\n", __FUNCTION__);
+#endif
   
   // Pupulate each device's register map then write it out to the devices.
   memset(&i2c_gpio_devices, 0, sizeof(i2c_gpio_devices));
@@ -254,7 +258,7 @@ aioc_i2c_gpio_configure(void)
   {
     pin_conf = &i2c_gpio_pin_configuration_table[i];
     
-    device = pin_conf->device_adrs - DEVICE_ADRS_BASE;
+    device = pin_conf->device;
     bank = pin_conf->bank;
     
     i2c_gpio_devices[device].regs.configuration[bank]  |=
@@ -271,6 +275,9 @@ aioc_i2c_gpio_configure(void)
   e = aioc_i2c_gpio_write_device_maps();
   if (e)  {  return e;  }
   
+#ifdef  AIOC_DEBUG
+printf("%s: exit\n", __FUNCTION__);
+#endif
   return error_none;
 }
 
@@ -284,6 +291,9 @@ aioc_i2c_gpio_pin_pulse_low(
   uint32_t pulse_duration) 
 {
   aioc_error_t e;
+#ifdef  AIOC_DEBUG
+printf("%s: enter\n", __FUNCTION__);
+#endif
 
   if (pin_name >= NUMBER_OF_GPIO_PINS)
   {
@@ -299,7 +309,7 @@ aioc_i2c_gpio_pin_pulse_low(
   {
     i2c_gpio_pin_conf_t*  pin_conf = &i2c_gpio_pin_configuration_table[pin_name];
     uint32_t              device_adrs = pin_conf->device_adrs;
-    uint32_t              device = device_adrs - DEVICE_ADRS_BASE;
+    uint32_t              device = pin_conf->device;
     uint32_t              bank = pin_conf->bank;
     uint32_t              pin = pin_conf->pin;
     uint32_t              command_byte = COMMAND_BYTE_OUTPUT_0 + bank;
@@ -326,6 +336,9 @@ aioc_i2c_gpio_pin_pulse_low(
   e = aioc_util_i2c_close();
   if (e)  {  return e;  }
   
+#ifdef  AIOC_DEBUG
+printf("%s: exit\n", __FUNCTION__);
+#endif
   return error_none;
 }
 
@@ -335,6 +348,9 @@ aioc_error_t
 aioc_i2c_gpio_pin_level_set( i2c_gpio_pin_name_t pin_name, uint32_t level) 
 {
   aioc_error_t e;
+#ifdef  AIOC_DEBUG
+printf("%s: enter\n", __FUNCTION__);
+#endif
 
   if (pin_name >= NUMBER_OF_GPIO_PINS)
   {
@@ -347,7 +363,7 @@ aioc_i2c_gpio_pin_level_set( i2c_gpio_pin_name_t pin_name, uint32_t level)
   {
     i2c_gpio_pin_conf_t*  pin_conf = &i2c_gpio_pin_configuration_table[pin_name];
     uint32_t              device_adrs = pin_conf->device_adrs;
-    uint32_t              device = device_adrs - DEVICE_ADRS_BASE;
+    uint32_t              device = pin_conf->device;
     uint32_t              bank = pin_conf->bank;
     uint32_t              pin = pin_conf->pin;
     uint32_t              command_byte = COMMAND_BYTE_OUTPUT_0 + bank;
@@ -374,6 +390,9 @@ aioc_i2c_gpio_pin_level_set( i2c_gpio_pin_name_t pin_name, uint32_t level)
   e = aioc_util_i2c_close();
   if (e)  {  return e;  }
   
+#ifdef  AIOC_DEBUG
+printf("%s: exit\n", __FUNCTION__);
+#endif
   return error_none;
 }
 

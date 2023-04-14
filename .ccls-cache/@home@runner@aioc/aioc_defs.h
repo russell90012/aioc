@@ -29,4 +29,6 @@ aioc_error_t;
 #define BIT_TST(arg,posn) BOOL((arg) & (1L << (posn)))
 #define BIT_FLP(arg,posn) ((arg) ^ (1L << (posn)))
 
+
+#define AIOC_DEBUG
 #endif  // AIOC_DEFS_H

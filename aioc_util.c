@@ -4,7 +4,6 @@
 
 #include "aioc_hw_sim.h"
 
-
 //==============================================================================
 //==============================================================================
 aioc_error_t aioc_util_delay_ns(uint32_t delay)
@@ -41,24 +40,12 @@ printf("%s: convert_id [%d], duration [%d]\n", __FUNCTION__,
 
 //==============================================================================
 //==============================================================================
-typedef struct
+aioc_error_t 
+aioc_util_spi_init(
+      struct aioc_util_spi_descriptor ** spi_desc,
+      struct aioc_spi_parm_init* parm)
 {
-  uint32_t descriptor;
-}
-aioc_spi_fp_t;
-
-static volatile aioc_spi_fp_t* aioc_spi_fp = 0;
-
-
-//==============================================================================
-//==============================================================================
-aioc_error_t aioc_util_spi_open(uint32_t dev_id, uint32_t cs_id)
-{
-  if (aioc_spi_fp)
-  {
-    aioc_util_spi_close();
-  }
-  
+    
   // TBD
    
   return error_none;
@@ -66,18 +53,20 @@ aioc_error_t aioc_util_spi_open(uint32_t dev_id, uint32_t cs_id)
   
 //==============================================================================
 //==============================================================================
-aioc_error_t aioc_util_spi_close(void)
+aioc_error_t aioc_util_spi_close(struct aioc_util_spi_descriptor * spi_desc)
 {
   // TBD
   
-  aioc_spi_fp = 0;
   
   return error_none;
 }
 
 //==============================================================================
 //==============================================================================
-aioc_error_t aioc_util_spi_transaction(uint8_t* data, uint32_t number_of_bytes)
+aioc_error_t aioc_util_spi_transaction(
+  struct aioc_util_spi_descriptor * spi_desc,
+  uint8_t* data,
+  uint32_t number_of_bytes)
 {
 #ifdef AIOC_HW_SIM
   aioc_hw_sim_spi_transaction(data, number_of_bytes);

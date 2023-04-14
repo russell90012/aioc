@@ -271,6 +271,13 @@ typedef enum
 i2c_gpio_pin_name_t;
 
 
+struct aioc_i2c_gpio_parm_init
+{
+  struct aioc_util_i2c_descriptor* desc;
+  i2c_gpio_pin_name_t              line;
+};
+
+
 /**
  * Initial configuration of the AIOC GPIO expanders per the configuration table
  * above.
@@ -289,7 +296,7 @@ aioc_error_t aioc_i2c_gpio_configure(void);
  * @return error handling result code.
  */
 aioc_error_t aioc_i2c_gpio_pin_pulse_low(
-  i2c_gpio_pin_name_t pin_name, 
+  i2c_gpio_pin_name_t line, 
   uint32_t pulse_duration);
 
 /**
@@ -302,7 +309,7 @@ aioc_error_t aioc_i2c_gpio_pin_pulse_low(
  * @return error handling result code.
  */
 aioc_error_t aioc_i2c_gpio_pin_level_set(
-  i2c_gpio_pin_name_t pin_name, 
+  i2c_gpio_pin_name_t line, 
   uint32_t level);
 
 

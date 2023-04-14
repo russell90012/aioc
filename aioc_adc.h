@@ -12,6 +12,8 @@
  */
 
 #include "aioc_defs.h"
+#include "aioc_i2c_gpio.h"
+#include "aioc_util.h"
 
 
 //================================
@@ -51,21 +53,48 @@ aioc_adc_input_t;
 
 typedef void* aioc_adc_handle_t;
 
+typedef enum
+{
+  AIOC_ADC_STATE_RESET = 0,
+  AIOC_ADC_STATE_REGISTER_MODE = 1,
+  AIOC_ADC_STATE_CONVERSION_MODE
+}
+aioc_adc_state_t;
+
+
+struct aioc_adc_parm_init
+{
+  struct aioc_spi_parm_init*        spi_parm_init;
+	struct aioc_i2c_gpio_parm_init*   gpio_parm_init_reset_n;  
+	struct aioc_i2c_gpio_parm_init*   gpio_parm_init_busy;  
+	struct aioc_i2c_gpio_parm_init*   gpio_parm_init_convert;
+};
+
+
+struct aioc_adc_dev
+{
+	/* SPI descriptor */
+	struct aioc_util_spi_descriptor		*spi_desc;
+  aioc_adc_state_t state;
+};
+
+
 
 /**
  * Perform ADC self-check, configuration, and start conversion mode for
  * this ADC.  And return handle to this ADC.
  *
- * @param aioc_adc_id is the ADC that gets initialized.
- *
- * @param aioc_adc_handle is the handle for this ADC that is passed back to
+ * @param dev is the aioc device context that is intialized passed back to
  *        the caller.
+ *
+ * @param adc_parm_init is the ADC parameter structure that helps
+ *         to initialize the ADC device.
  *
  * @return error handling result code.
  */
 aioc_error_t aioc_adc_init(
-  aioc_adc_id_t aioc_adc_id,
-  aioc_adc_handle_t* aioc_adc_handle);
+  struct aioc_adc_dev** device,
+  struct aioc_adc_parm_init* adc_parm_init);
 
 /**
  * Perform a single-cycle mode adc conversion for for the specified input
@@ -78,7 +107,7 @@ aioc_error_t aioc_adc_init(
  * @return error handling result code.
  */
 aioc_error_t aioc_adc_convert_single_cycle(
-  aioc_adc_handle_t adc_handle, 
+  struct aioc_adc_dev* dev, 
   aioc_adc_input_t adc_input,
   uint16_t* result);
 
