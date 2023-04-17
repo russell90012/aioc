@@ -46,48 +46,44 @@ aioc_init(void)
 {
   aioc_error_t e = error_none;
 
-  // Initialize the i2c bus descriptor.
-  e = aioc_util_i2c_init(&i2c_desc);
-  if (e)  {  return e;  }
+  struct ad469x_dev *dev;
 
-  // Configure the AIOC i2c GPIO.
-  e = aioc_i2c_gpio_configure();
-  if (e)  {  return e;  }
+   
+	struct xil_gpio_init_param gpio_extra_param = {
+		.device_id = GPIO_DEVICE_ID,
+		.type = GPIO_PS,
+	};
 
-  // Fill in parameter structures for 5V ADC.  Then initialize it.
-  struct aioc_spi_parm_init spi_parm_init =
-  {
-    .dev_id = 0,
-    .cs_id = 0,
-  };
-  
- 	struct aioc_i2c_gpio_parm_init gpio_parm_init_reset_n = 
-  {
-    .line = A5V_3V3_ADC_RESET_N,
-    .desc = i2c_desc,
-  };
-  
- 	struct aioc_i2c_gpio_parm_init gpio_parm_init_busy = 
-  {
-    .line = A5V_3V3_ADC_BUSY,
-    .desc = i2c_desc,
-  };
-  
-	struct aioc_i2c_gpio_parm_init gpio_parm_init_convert = 
-  {
-    .line = 0,
-    .desc = i2c_desc,
-  };
-  
-  struct aioc_adc_parm_init  adc_parm_init_5v =
-  {
-    .spi_parm_init =     &spi_parm_init,
-    .gpio_parm_init_reset_n = &gpio_parm_init_reset_n,
-    .gpio_parm_init_busy = &gpio_parm_init_busy,
-    .gpio_parm_init_convert = &gpio_parm_init_convert,
-  };
-  
-  e = aioc_adc_init(&aioc_adc_dev_5v, &adc_parm_init_5v);
+	struct no_os_gpio_init_param ad469x_resetn = {
+		.number = GPIO_RESETN_1,
+		.platform_ops = &xil_gpio_ops,
+		.extra = &gpio_extra_param
+	};
+
+	struct no_os_spi_init_param spi_init = {
+		.chip_select = AD469x_SPI_CS,
+		.max_speed_hz = 80000000,
+		.mode = NO_OS_SPI_MODE_3,
+		.platform_ops = &spi_eng_platform_ops,
+		.extra = (void*)&spi_eng_init_param,
+	};
+
+	struct ad469x_init_param ad469x_init_param_5v = {
+		.spi_init = &spi_init,
+		.offload_init_param = &spi_engine_offload_init_param,
+		.trigger_pwm_init = &trigger_pwm_init,
+		.gpio_resetn = &ad469x_resetn,
+		.clkgen_init = &clkgen_init,
+		.axi_clkgen_rate = 160000000,
+		.reg_access_speed = 20000000,
+		.reg_data_width = 8,
+		.capture_data_width = 16,
+		.dev_id = ID_AD4696, /* dev_id */
+		.dcache_invalidate_range =
+		(void (*)(uint32_t, uint32_t))Xil_DCacheInvalidateRange,
+	};
+
+ e = aioc_adc_init(&dev, &ad469x_init_param_5v);
   if (e)  {  return e;  }
 
   return error_none;

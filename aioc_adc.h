@@ -62,6 +62,108 @@ typedef enum
 aioc_adc_state_t;
 
 
+
+/**
+ * @struct ad469x_init_param
+ * @brief  Structure containing the init parameters needed by the ad469x device
+ */
+struct ad469x_init_param {
+	/* SPI */
+	struct no_os_spi_init_param		*spi_init;
+#if !defined(USE_STANDARD_SPI)
+	/* SPI module offload init */
+	struct spi_engine_offload_init_param *offload_init_param;
+	/* PWM generator init structure */
+	struct no_os_pwm_init_param	*trigger_pwm_init;
+	/* Clock gen for hdl design init structure */
+	struct axi_clkgen_init	*clkgen_init;
+	/* Clock generator rate */
+	uint32_t		axi_clkgen_rate;
+#endif
+	/** RESET GPIO initialization structure. */
+	struct no_os_gpio_init_param	*gpio_resetn;
+	/** CONVST GPIO initialization parameters */
+	struct no_os_gpio_init_param *gpio_convst;
+	/** BUSY GPIO initialization parameters */
+	struct no_os_gpio_init_param *gpio_busy;
+	/* Register access speed */
+	uint32_t		reg_access_speed;
+	/* Register data width */
+	uint8_t		reg_data_width;
+	/* Capture data width */
+	uint8_t		capture_data_width;
+	/* Device Settings */
+	enum ad469x_supported_dev_ids dev_id;
+	/* Pin Pairing option in standard sequencer mode */
+	enum ad469x_pin_pairing std_seq_pin_pairing;
+	/* Channel sequencing mode */
+	enum ad469x_channel_sequencing ch_sequence;
+	/** OSR resolution corresponding to all channels, when standard
+	 * sequencer is selected. */
+	enum ad469x_osr_ratios std_seq_osr;
+	/** OSR resolution corresponding to each channel, when advanced
+	 * sequencer is selected. */
+	enum ad469x_osr_ratios adv_seq_osr_resol[AD469x_CHANNEL_NO];
+	/** Invalidate the Data cache for the given address range */
+	void (*dcache_invalidate_range)(uint32_t address, uint32_t bytes_count);
+};
+
+/**
+ * @struct ad469x_dev
+ * @brief  Structure representing an ad469x device
+ */
+struct ad469x_dev {
+	/* SPI descriptor */
+	struct no_os_spi_desc		*spi_desc;
+#if !defined(USE_STANDARD_SPI)
+	/* Clock gen for hdl design structure */
+	struct axi_clkgen	*clkgen;
+	/* Trigger conversion PWM generator descriptor */
+	struct no_os_pwm_desc		*trigger_pwm_desc;
+	/* SPI module offload init */
+	struct spi_engine_offload_init_param *offload_init_param;
+#endif
+	/* Register access speed */
+	uint32_t		reg_access_speed;
+	/* Register data width */
+	uint8_t		reg_data_width;
+	/* Capture data width */
+	uint8_t		capture_data_width;
+	/* Device Settings */
+	enum ad469x_supported_dev_ids dev_id;
+	/** RESET GPIO handler. */
+	struct no_os_gpio_desc	*gpio_resetn;
+	/** CONVST GPIO descriptor */
+	struct no_os_gpio_desc *gpio_convst;
+	/** BUSY GPIO descriptor */
+	struct no_os_gpio_desc *gpio_busy;
+	/** Invalidate the Data cache for the given address range */
+	void (*dcache_invalidate_range)(uint32_t address, uint32_t bytes_count);
+	/** Current channel sequence */
+	enum ad469x_channel_sequencing ch_sequence;
+	/* Pin Pairing option in standard sequencer mode */
+	enum ad469x_pin_pairing std_seq_pin_pairing;
+	/** OSR resolution corresponding to all channels, when standard
+	 * sequencer is selected. */
+	enum ad469x_osr_ratios std_seq_osr;
+	/** OSR resolution corresponding to each channel, when advanced
+	 * sequencer is selected. */
+	enum ad469x_osr_ratios adv_seq_osr_resol[AD469x_CHANNEL_NO];
+	/** Channel slots for advanced sequencer */
+	uint8_t ch_slots[AD469x_SLOTS_NO];
+	/** Temperature enabled for standard and advanced sequencer if set. */
+	bool temp_enabled;
+	/** Number of active channel slots, for advanced sequencer */
+	uint8_t num_slots;
+};
+
+
+
+
+
+
+
+
 struct aioc_adc_parm_init
 {
   struct aioc_spi_parm_init*        spi_parm_init;

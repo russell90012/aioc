@@ -25,7 +25,7 @@ void  aioc_hw_sim_delay_ns(size_t delay)
 }
 
 
-void aioc_hw_sim_spi_transaction(uint8_t* data, uint32_t data_count)
+void aioc_hw_sim_spi_transaction(uint32_t dev_id, uint32_t cs_id, uint8_t* data, uint32_t data_count)
 {
   // Check the size of transaction.
   // If it's two then it's a conversion mode transaction.

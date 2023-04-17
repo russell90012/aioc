@@ -238,13 +238,14 @@ aioc_adc_init(
 printf("%s: enter\n", __FUNCTION__);
 #endif
  
-	dev = (struct aioc_adc_dev *)malloc(sizeof(*dev));
+	// TBD
+  dev = (struct aioc_adc_dev *)malloc(sizeof(*dev));
 	if (!dev)
-		return -1;
-
+  {
+    return error_alloc;
+  }
 
 	e = aioc_util_spi_init(&dev->spi_desc, adc_parm_init->spi_parm_init);
-  if (e) {  return e;  }
 
   // Perform ADC reset.
   e = aioc_adc_reset(dev);

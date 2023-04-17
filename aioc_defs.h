@@ -17,7 +17,8 @@ typedef enum  // aioc_error_t
   error_adc_self_check,
   error_adc_init,
   error_ai_mapping,
-  error_bad_state
+  error_bad_state,
+  error_alloc,
 }
 aioc_error_t;
 

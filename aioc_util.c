@@ -4,6 +4,8 @@
 
 #include "aioc_hw_sim.h"
 
+#include <stdlib.h>
+
 //==============================================================================
 //==============================================================================
 aioc_error_t aioc_util_delay_ns(uint32_t delay)
@@ -42,9 +44,17 @@ printf("%s: convert_id [%d], duration [%d]\n", __FUNCTION__,
 //==============================================================================
 aioc_error_t 
 aioc_util_spi_init(
-      struct aioc_util_spi_descriptor ** spi_desc,
+      struct aioc_util_spi_descriptor** spi_desc,
       struct aioc_spi_parm_init* parm)
 {
+  struct aioc_util_spi_descriptor* desc;
+
+	desc = (struct aioc_util_spi_descriptor *)malloc(sizeof(*desc));
+	if (!desc)
+  {  return error_alloc;  }
+
+  desc->dev_id = parm->dev_id;
+  desc->cs_id = parm->cs_id;
     
   // TBD
    

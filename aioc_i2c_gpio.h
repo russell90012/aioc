@@ -13,6 +13,7 @@
 
 #include "aioc_defs.h"
 
+#include <stdint.h>
 
 //================================
 // Public specifications.
@@ -271,11 +272,44 @@ typedef enum
 i2c_gpio_pin_name_t;
 
 
-struct aioc_i2c_gpio_parm_init
-{
-  struct aioc_util_i2c_descriptor* desc;
-  i2c_gpio_pin_name_t              line;
+
+
+
+
+
+
+
+/**
+ * @struct no_os_gpio_init_param
+ * @brief Structure holding the parameters for GPIO initialization.
+ */
+struct no_os_gpio_init_param {
+	/** Port number */
+	int32_t		port;
+	/** GPIO number */
+	int32_t		number;
+	/** GPIO extra parameters (device specific) */
+	void		*extra;
 };
+
+/**
+ * @struct no_os_gpio_desc
+ * @brief Structure holding the GPIO descriptor.
+ */
+struct no_os_gpio_desc {
+	/** Port number */
+	int32_t		port;
+	/** GPIO number */
+	int32_t		number;
+	/** GPIO platform specific functions */
+	/** GPIO extra parameters (device specific) */
+	void		*extra;
+};
+
+
+
+
+
 
 
 /**
