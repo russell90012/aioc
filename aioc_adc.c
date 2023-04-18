@@ -77,7 +77,7 @@
  *
  * @return error handling result code.
  */
-static aioc_error_t aioc_adc_reset(struct aioc_adc_dev* dev);
+static aioc_error_t aioc_adc_reset_dev(struct aioc_adc_dev* dev);
 
 /**
  * Check vendor and device id register values for expected values.  Check that
@@ -229,10 +229,10 @@ static aioc_error_t aioc_adc_conversion_mode_result_read(struct aioc_adc_dev* de
 //==============================================================================
 aioc_error_t 
 aioc_adc_init(
-  struct aioc_adc_dev** device,
-  struct aioc_adc_parm_init* adc_parm_init)
+  struct ad469x_dev** device,
+  struct ad469x_init_param* init_param)
 {
-  struct aioc_adc_dev* dev;
+  struct ad469x_dev* dev;
   aioc_error_t e = error_none;
 #ifdef  AIOC_DEBUG
 printf("%s: enter\n", __FUNCTION__);
@@ -245,10 +245,14 @@ printf("%s: enter\n", __FUNCTION__);
     return error_alloc;
   }
 
-	e = aioc_util_spi_init(&dev->spi_desc, adc_parm_init->spi_parm_init);
+	e = aioc_util_spi_init(&dev->spi_desc, init_param->spi_init);
+  if (e) {  return e;  }
 
-  // Perform ADC reset.
-  e = aioc_adc_reset(dev);
+	e = ad469x_init_gpio(dev, init_param);
+  if (e) {  return e;  }
+
+// Perform ADC reset.
+  e = aioc_adc_reset_dev(dev);
   if (e) {  return e;  }
 
   // Perform ADC self-check.
@@ -331,8 +335,7 @@ printf("%s: exit\n", __FUNCTION__);
 
 //==============================================================================
 //==============================================================================
-static aioc_error_t
-aioc_adc_reset(struct aioc_adc_dev* dev)
+static aioc_error_t aioc_adc_reset_dev(struct ad469x_dev* dev)
 {
   aioc_error_t e = error_none;
 
@@ -355,6 +358,36 @@ aioc_adc_reset(struct aioc_adc_dev* dev)
 // Register Configuration Mode routines.
 //
 //==============================================================================
+/**
+ * @brief Initialize GPIO driver handlers for the GPIOs in the system.
+ *        ad469x_init() helper function.
+ * @param [out] dev - ad469x_dev device handler.
+ * @param [in] init_param - Pointer to the initialization structure.
+ * @return 0 in case of success, -1 otherwise.
+ */
+static int32_t ad469x_init_gpio(
+         struct ad469x_dev *dev,
+				 struct ad469x_init_param *init_param)
+{
+	int32_t ret;
+
+	ret = no_os_gpio_get_optional(&dev->gpio_resetn, init_param->gpio_resetn);
+	if (ret != 0)
+		return ret;
+
+	ret = no_os_gpio_direction_output(dev->gpio_resetn, NO_OS_GPIO_HIGH);
+	if (ret != 0)
+		return ret;
+
+
+	return 0;
+}
+
+
+
+
+
+
 //==============================================================================
 //==============================================================================
 static aioc_error_t

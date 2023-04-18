@@ -195,8 +195,8 @@ struct aioc_adc_dev
  * @return error handling result code.
  */
 aioc_error_t aioc_adc_init(
-  struct aioc_adc_dev** device,
-  struct aioc_adc_parm_init* adc_parm_init);
+  struct ad469x_dev** device,
+  struct ad469x_init_param* adc_parm_init);
 
 /**
  * Perform a single-cycle mode adc conversion for for the specified input

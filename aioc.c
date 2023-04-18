@@ -3,6 +3,7 @@
 
 #include "aioc.h"
 #include "aioc_adc.h"
+#include "aioc_gpio.h"
 
 
 //==========================
@@ -49,23 +50,32 @@ aioc_init(void)
   struct ad469x_dev *dev;
 
    
-	struct xil_gpio_init_param gpio_extra_param = {
+	struct aioc_i2c_gpio_init_param aioc_i2c_gpio_init = {
 		.device_id = GPIO_DEVICE_ID,
 		.type = GPIO_PS,
 	};
 
 	struct no_os_gpio_init_param ad469x_resetn = {
-		.number = GPIO_RESETN_1,
-		.platform_ops = &xil_gpio_ops,
-		.extra = &gpio_extra_param
+		.number = GPIO_RESETN_5V,
+		.platform_ops = &aioc_i2c_gpio_ops,
+		.extra = &aioc_i2c_gpio_init
 	};
 
+	struct xil_gpio_init_param xil_gpio_init = {
+		.device_id = GPIO_DEVICE_ID,
+		.type = GPIO_PS,
+	};
+
+	struct no_os_gpio_init_param ad469x_cnv= {
+		.number = GPIO_CNV_5V,
+		.platform_ops = &xil_gpio_ops,
+		.extra = &xil_gpio_init
+	};
+
+	
 	struct no_os_spi_init_param spi_init = {
-		.chip_select = AD469x_SPI_CS,
-		.max_speed_hz = 80000000,
-		.mode = NO_OS_SPI_MODE_3,
-		.platform_ops = &spi_eng_platform_ops,
-		.extra = (void*)&spi_eng_init_param,
+		.chip_select = 0,
+    .device_id = 0
 	};
 
 	struct ad469x_init_param ad469x_init_param_5v = {

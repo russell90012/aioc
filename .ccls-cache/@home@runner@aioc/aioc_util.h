@@ -76,7 +76,7 @@ aioc_error_t aioc_util_spi_init(
 
 
 aioc_error_t aioc_util_spi_transaction(
-              struct no_os_spi_init_param * spi_desc,
+              struct no_os_spi_desc * spi_desc,
               uint8_t* data,
               uint32_t number_of_bytes);
 

@@ -3,6 +3,7 @@
 
 #include "aioc.h"
 #include "aioc_adc.h"
+#include "aioc_gpio.h"
 
 
 //==========================
@@ -51,11 +52,11 @@ aioc_init(void)
    
 	struct xil_gpio_init_param gpio_extra_param = {
 		.device_id = GPIO_DEVICE_ID,
-		.type = GPIO_PS,
+		.type = GPIO_I2C,
 	};
 
 	struct no_os_gpio_init_param ad469x_resetn = {
-		.number = GPIO_RESETN_1,
+		.number = A5V_3V3_ADC_RESET_N,
 		.platform_ops = &xil_gpio_ops,
 		.extra = &gpio_extra_param
 	};

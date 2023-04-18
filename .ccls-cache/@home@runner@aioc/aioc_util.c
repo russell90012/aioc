@@ -4,7 +4,9 @@
 
 #include "aioc_hw_sim.h"
 
+#include <stdio.h>
 #include <stdlib.h>
+
 
 //==============================================================================
 //==============================================================================
@@ -42,10 +44,10 @@ printf("%s: convert_id [%d], duration [%d]\n", __FUNCTION__,
 
 //==============================================================================
 //==============================================================================
-aioc_error_t 
-aioc_util_spi_init(
-      struct aioc_util_spi_descriptor** spi_desc,
-      struct aioc_spi_parm_init* parm)
+ 
+aioc_error_t aioc_util_spi_init(
+              struct no_os_spi_desc ** spi_desc,
+              struct no_os_spi_init_param* parm)
 {
   struct aioc_util_spi_descriptor* desc;
 
@@ -53,8 +55,8 @@ aioc_util_spi_init(
 	if (!desc)
   {  return error_alloc;  }
 
-  desc->dev_id = parm->dev_id;
-  desc->cs_id = parm->cs_id;
+  //desc->dev_id = parm->dev_id;
+  //desc->cs_id = parm->cs_id;
     
   // TBD
    

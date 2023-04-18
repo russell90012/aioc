@@ -272,44 +272,39 @@ typedef enum
 i2c_gpio_pin_name_t;
 
 
-
-
-
+enum aioc_i2c_gpio_direction
+{
+  AIOC_I2C_GPIO_DIRECTION_OUTPUT = 0,
+  AIOC_I2C_GPIO_DIRECTION_INPUT = 1
+}
 
 
 
 
 /**
- * @struct no_os_gpio_init_param
- * @brief Structure holding the parameters for GPIO initialization.
+ * Sets the specified pin to the specified direction.
+ *
+ * @param pin is the number of the specified pin.
+ *
+ * @param direction is the specified pin direction.
+ *
+ * @return error handling result code.
  */
-struct no_os_gpio_init_param {
-	/** Port number */
-	int32_t		port;
-	/** GPIO number */
-	int32_t		number;
-	/** GPIO extra parameters (device specific) */
-	void		*extra;
-};
+aioc_error_t aioc_i2c_gpio_direction_set(
+  i2c_gpio_pin_name_t pin,
+  enum aioc_i2c_gpio_direction direction);
+  
 
 /**
- * @struct no_os_gpio_desc
- * @brief Structure holding the GPIO descriptor.
+ * Sets the specified pin to the specified direction.
+ *
+ * @param pin is the number of the specified pin.
+ *
+ * @param value is the specified pin output value.
+ *
+ * @return error handling result code.
  */
-struct no_os_gpio_desc {
-	/** Port number */
-	int32_t		port;
-	/** GPIO number */
-	int32_t		number;
-	/** GPIO platform specific functions */
-	/** GPIO extra parameters (device specific) */
-	void		*extra;
-};
-
-
-
-
-
+aioc_error_t aioc_i2c_gpio_output_set(i2c_gpio_pin_name_t pin, uint32_t value);
 
 
 /**
